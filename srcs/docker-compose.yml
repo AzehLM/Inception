@@ -1,0 +1,22 @@
+services:
+  mariadb:
+    container_name: mariadb
+    build: requirements/mariadb
+    ports:
+      - "127.0.0.1:3306:3306"
+    volumes:
+      - mariadb:/var/lib/mysql
+      - ./srcs/requirements/mariadb/conf:/docker-entrypoint-initdb.d/
+    env_file:
+      - ../secrets/mariadb/.env
+  nginx:
+    container_name: nginx
+    build: requirements/nginx
+    ports:
+      - "127.0.0.1:443:443"
+    volumes:
+      - nginx:/usr/share/nginx/html
+
+volumes:
+  mariadb:
+  nginx:
