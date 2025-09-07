@@ -1,22 +1,73 @@
 services:
-  mariadb:
-    container_name: mariadb
-    build: requirements/mariadb
-    ports:
-      - "127.0.0.1:3306:3306"
-    volumes:
-      - mariadb:/var/lib/mysql
-      - ./srcs/requirements/mariadb/conf:/docker-entrypoint-initdb.d/
-    env_file:
-      - ../secrets/mariadb/.env
   nginx:
     container_name: nginx
     build: requirements/nginx
+    # Need to had back 127.0.0.1 for safety. Removed it for now to test it on host machine
     ports:
-      - "127.0.0.1:443:443"
+      - "443:443"
     volumes:
-      - nginx:/usr/share/nginx/html
+      - wordpress_data:/var/www/html
+      # - nginx:/usr/share/nginx/html
+    secrets:
+      - ssl_certification
+      - ssl_key
+    networks:
+      - inception
+    restart: always
+
+  mariadb:
+    container_name: mariadb
+    build: requirements/mariadb
+    # On va delete les ports ouvert de tous les containers a l'exception de nginx, qui doit etre le seul port ouvert pour le rendu.
+    # On laisse les ports exposés dans les Dockerfile pour permettre au network ouvert via un bridge de communiqué entre containers et ca suffira
+    # On laisse pour l'instant les ports ouverts pour pouvoir tester correctement nos contenaires independaments
+    # ports:
+    #   - "3306:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+      - ./requirements/mariadb/conf:/docker-entrypoint-initdb.d/
+    secrets:
+      - mariadb_root_password
+      - mariadb_database
+      - mariadb_user
+      - mariadb_password
+    networks:
+      - inception
+    # doute sur le restart: always. Il y a restart: unless-stopped qui pourrait etre une solution.
+    restart: always
 
 volumes:
-  mariadb:
-  nginx:
+  mariadb_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/gueberso/data/mariadb
+  wordpress_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/gueberso/data/wordpress
+
+networks:
+  inception:
+    driver: bridge
+
+
+secrets:
+  mariadb_root_password:
+    file: ../secrets/db_root_password.txt
+  mariadb_database:
+    file: ../secrets/db_name.txt
+  mariadb_user:
+    file: ../secrets/db_user.txt
+  mariadb_password:
+    file: ../secrets/db_password.txt
+  # commented for now because we're generation the certificate and the key at container creation
+  # need to move it to Makefile, as first thing to do so it runs once and we don't recreate certification + key everytime the files are modified
+  # Also will allow us to remove nginx Dockerfile dependencies -> will only have to mount files in the container.
+  # ssl_certification:
+  #   file: ../secrets/ssl/gueberso.42.fr.crt
+  # ssl_key:
+  #   file: ../secrets/ssl/gueberso.42.fr.key
