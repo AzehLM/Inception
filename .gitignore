@@ -2,5 +2,5 @@
 learning
 
 # secrets and credentials
-.env
-secrets/
+# .env
+# secrets/
