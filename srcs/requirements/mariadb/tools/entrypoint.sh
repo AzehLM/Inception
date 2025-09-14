@@ -1,6 +1,18 @@
 #!/bin/sh
 set -e
 
+# Read secrets from files
+MARIADB_ROOT_PASSWORD=$(cat /run/secrets/mariadb_root_password)
+MARIADB_DATABASE=$(cat /run/secrets/mariadb_database)
+MARIADB_USER=$(cat /run/secrets/mariadb_user)
+MARIADB_PASSWORD=$(cat /run/secrets/mariadb_password)
+
+# Export for envsubst
+export MARIADB_ROOT_PASSWORD
+export MARIADB_DATABASE
+export MARIADB_USER
+export MARIADB_PASSWORD
+
 # Creates needed directory so mariadb can be launched correctly
 mkdir -p /run/mysqld
 chown mysql:mysql /run/mysqld

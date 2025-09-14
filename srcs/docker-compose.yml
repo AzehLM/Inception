@@ -7,10 +7,10 @@ services:
       - "443:443"
     volumes:
       - wordpress_data:/var/www/html
-      # - nginx:/usr/share/nginx/html
-    secrets:
-      - ssl_certification
-      - ssl_key
+      # - nginx:/usr/share/nginx/htmlt
+    # secrets:
+    #   - ssl_certification
+    #   - ssl_key
     networks:
       - inception
     restart: always
@@ -36,6 +36,9 @@ services:
     # doute sur le restart: always. Il y a restart: unless-stopped qui pourrait etre une solution.
     restart: always
 
+
+# Top-level ressources configuration
+
 volumes:
   mariadb_data:
     driver: local
@@ -54,16 +57,15 @@ networks:
   inception:
     driver: bridge
 
-
 secrets:
   mariadb_root_password:
-    file: ../secrets/db_root_password.txt
+    file: ../secrets/mariadb/db_root_password.txt
   mariadb_database:
-    file: ../secrets/db_name.txt
+    file: ../secrets/mariadb/db_name.txt
   mariadb_user:
-    file: ../secrets/db_user.txt
+    file: ../secrets/mariadb/db_user.txt
   mariadb_password:
-    file: ../secrets/db_password.txt
+    file: ../secrets/mariadb/db_password.txt
   # commented for now because we're generation the certificate and the key at container creation
   # need to move it to Makefile, as first thing to do so it runs once and we don't recreate certification + key everytime the files are modified
   # Also will allow us to remove nginx Dockerfile dependencies -> will only have to mount files in the container.
