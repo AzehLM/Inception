@@ -13,7 +13,14 @@ services:
     #   - ssl_key
     networks:
       - inception
+    init: true
     restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-k", "-f", "https://localhost:443/"] # -k ignore les erreurs de notre certificat autosigne, -f renvoie un code d'erreur different de 0
+      interval: 30s # tests effectuer toutes les 30s
+      timeout: 3s # 3 seconde pour avoir un retour du test
+      retries: 3 # autorise 3 retries avant de declarer le service unhealthy
+      start_period: 5s # laisse 5 secondes au service pour ce lancer, ensuite le healthcheck est declencher
 
   mariadb:
     container_name: mariadb
@@ -35,27 +42,36 @@ services:
       - inception
     # doute sur le restart: always. Il y a restart: unless-stopped qui pourrait etre une solution.
     restart: always
-
+    # restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mariadb-admin", "ping", "-h", "localhost"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 30s
 
 # Top-level ressources configuration
+# commented binding so it works on WSl aswell
 
 volumes:
   mariadb_data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /home/gueberso/data/mariadb
+    # driver: local
+    # driver_opts:
+    #   type: none
+    #   o: bind
+    #   device: /home/gueberso/data/mariadb
   wordpress_data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /home/gueberso/data/wordpress
+  #   driver: local
+  #   driver_opts:
+  #     type: none
+  #     o: bind
+  #     device: /home/gueberso/data/wordpress
 
 networks:
   inception:
     driver: bridge
+
+# Secret files
 
 secrets:
   mariadb_root_password:
