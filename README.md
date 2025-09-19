@@ -1,9 +1,6 @@
-# Advanced Docker Concepts for 42 Inception Project
+# Dump notions (not detailed)
 
-## Overview
-This guide covers advanced Docker features that will significantly enhance your containerization skills and make your Inception project stand out. These concepts go beyond basic `docker run` and `docker-compose up` to provide production-ready, secure, and efficient solutions.
-
-## 🔄 Docker Compose Watch Mode
+## Docker Compose Watch Mode
 **What it is**: Automatically rebuilds and restarts services when code changes are detected.
 
 ```yaml
@@ -23,7 +20,7 @@ services:
 **Usage**: `docker compose watch`
 **Benefits**: Instant development feedback, no manual rebuilds needed.
 
-## 🏥 Health Checks
+## Health Checks
 **What it is**: Built-in monitoring to ensure containers are actually working, not just running.
 
 ```dockerfile
@@ -46,7 +43,7 @@ services:
 
 **Benefits**: Automatic container restart on failure, better orchestration decisions.
 
-## 🏗️ Multi-Stage Builds
+## Multi-Stage Builds
 **What it is**: Use multiple FROM statements to create optimized, smaller final images.
 
 ```dockerfile
@@ -67,7 +64,7 @@ CMD ["npm", "start"]
 
 **Benefits**: Smaller images, better security (no build tools in production), faster deployments.
 
-## 🚀 BuildKit Advanced Features
+## BuildKit Advanced Features
 **What it is**: Modern build engine with advanced caching and parallel builds.
 
 ```dockerfile
@@ -86,7 +83,7 @@ RUN --mount=type=secret,id=api_key \
 **Enable with**: `DOCKER_BUILDKIT=1` or in daemon.json
 **Benefits**: Faster builds, better caching, secrets handling, parallel execution.
 
-## 🔒 Docker Secrets & Security
+## Docker Secrets & Security
 **What it is**: Secure way to handle sensitive data without embedding in images.
 
 ```yaml
@@ -115,25 +112,8 @@ USER nextjs
 FROM gcr.io/distroless/nodejs18-debian11
 ```
 
-## ⚡ Resource Constraints
-**What it is**: Control CPU, memory, and I/O usage.
 
-```yaml
-services:
-  web:
-    deploy:
-      resources:
-        limits:
-          cpus: '0.50'
-          memory: 512M
-        reservations:
-          cpus: '0.25'
-          memory: 256M
-    ulimits:
-      nofile: 65536
-```
-
-## 🔧 Init System in Containers
+## Init System in Containers
 **What it is**: Proper signal handling and zombie process reaping.
 
 ```dockerfile
@@ -152,7 +132,7 @@ services:
     init: true
 ```
 
-## 📊 Advanced Networking
+## Advanced Networking
 **What it is**: Custom networks for service isolation and communication.
 
 ```yaml
@@ -177,7 +157,7 @@ networks:
     internal: true  # No external access
 ```
 
-## 💾 Volume Best Practices
+## Volume Best Practices
 **What it is**: Efficient data persistence and sharing strategies.
 
 ```yaml
@@ -203,7 +183,7 @@ volumes:
       device: /host/path/data
 ```
 
-## 📱 Container Communication Patterns
+## Container Communication Patterns
 
 ```yaml
 # Service dependencies with conditions
@@ -219,7 +199,7 @@ services:
       test: ["CMD", "pg_isready", "-U", "postgres"]
 ```
 
-## 🔍 Monitoring & Debugging
+## Monitoring & Debugging
 
 ```bash
 # Monitor resource usage
@@ -235,7 +215,7 @@ docker exec container_name ps aux
 docker diff container_name
 ```
 
-## 🛠️ Development Workflow Commands
+## Development Workflow Commands
 
 ```bash
 # Build with build-time arguments
@@ -251,7 +231,7 @@ docker compose up --scale web=3
 docker compose logs -f --timestamps web
 ```
 
-## 🎯 Pro Tips for Your Inception Project
+## Tips
 
 1. **Use `.dockerignore`** to exclude unnecessary files from build context
 2. **Implement graceful shutdown** handling in your applications
@@ -298,7 +278,7 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 CMD ["npm", "start"]
 ```
 
-## 🚀 Getting Started
+## Getting Started
 
 1. Enable BuildKit: `export DOCKER_BUILDKIT=1`
 2. Start with health checks for all your services
@@ -306,5 +286,3 @@ CMD ["npm", "start"]
 4. Use multi-stage builds for optimized images
 5. Add proper resource constraints
 6. Implement security best practices from day one
-
-These advanced concepts will make your Inception project production-ready and demonstrate deep Docker expertise!
