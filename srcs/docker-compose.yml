@@ -7,7 +7,7 @@ services:
       - "443:443"
     volumes:
       - wordpress_data:/var/www/html
-      # - nginx:/usr/share/nginx/htmlt
+      # - nginx:/usr/share/nginx/html
     # secrets:
     #   - ssl_certification
     #   - ssl_key
@@ -50,9 +50,19 @@ services:
       retries: 3
       start_period: 30s
 
-# Top-level ressources configuration
-# commented binding so it works on WSl aswell
+  # wordpress:
+  #   container_name: wordpress
+  #   build: requirements/wordpress
+  #   networks:
+  #     - inception
+  #   restart: always
+  #   volumes:
 
+# Top-level ressources configuration
+
+# binding commented so it works on personnal machine (WSL) aswell
+# /user/login is different on my personnal computer
+# cba changing it and forgetting later on
 volumes:
   mariadb_data:
     # driver: local
