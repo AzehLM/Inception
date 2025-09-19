@@ -32,7 +32,6 @@ COPY tools/entrypoint.sh entrypoint.sh
 
 RUN chmod +x entrypoint.sh
 
-# not sure I need this since the network is communicating between services automaticaly
 EXPOSE 9000
 
 ENTRYPOINT [ "./entrypoint.sh" ]
