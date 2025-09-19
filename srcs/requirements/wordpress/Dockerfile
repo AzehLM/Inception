@@ -15,7 +15,7 @@ RUN apk add --no-cache \
 	php83-curl \
 	# performance improvement
 	php83-opcache \
-	#
+	# importing redis since we'll need to for the bonus service
 	redis \
 	# native PHP support for connecting to Redis servers
 	php83-redis
@@ -26,3 +26,13 @@ RUN apk add --no-cache \
 	# php83-xml: required for XML parsing. WordPress core and several plugins depend on this
 	# php83-zip: Necessary for installing/updating plugins and themes via the admin interface.
 	# php83-ctype: Required for character type functions; many extensions and WordPress core expect it to be present
+
+COPY conf/www.conf /etc/php83/www.conf
+COPY tools/entrypoint.sh entrypoint.sh
+
+RUN chmod +x entrypoint.sh
+
+# not sure I need this since the network is communicating between services automaticaly
+EXPOSE 9000
+
+ENTRYPOINT [ "./entrypoint.sh" ]
