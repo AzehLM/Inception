@@ -2,7 +2,6 @@
 
 FROM alpine:3.21
 
-
 RUN apk add --no-cache \
 	# process manager needed for nginx to serve php
 	php83-fpm \
