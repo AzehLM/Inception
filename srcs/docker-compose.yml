@@ -60,22 +60,19 @@ services:
 
 # Top-level ressources configuration
 
-# binding commented so it works on personnal machine (WSL) aswell
-# /user/login is different on my personnal computer
-# cba changing it and forgetting later on
 volumes:
   mariadb_data:
-    # driver: local
-    # driver_opts:
-    #   type: none
-    #   o: bind
-    #   device: /home/gueberso/data/mariadb
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/gueberso/data/mariadb
   wordpress_data:
-  #   driver: local
-  #   driver_opts:
-  #     type: none
-  #     o: bind
-  #     device: /home/gueberso/data/wordpress
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/gueberso/data/wordpress
 
 networks:
   inception:
