@@ -4,6 +4,10 @@ FROM alpine:3.21
 
 RUN apk add --no-cache \
 	# process manager needed for nginx to serve php
+	# DELETE THOSE TWO ?
+	# only to test php wp-cli.phar --info
+	php83 \
+	php83-phar \
 	php83-fpm \
 	# connect for Wordpress to connect to mariadb
 	# if it doesnt work change or add mysqlnd, should work together
@@ -26,6 +30,10 @@ RUN apk add --no-cache \
 	# php83-zip: Necessary for installing/updating plugins and themes via the admin interface.
 	# php83-ctype: Required for character type functions; many extensions and WordPress core expect it to be present
 
+RUN wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \
+	&& chmod +x wp-cli.phar \
+	&& mv wp-cli.phar /usr/local/bin/wp
+
 COPY conf/www.conf /etc/php83/www.conf
 COPY tools/entrypoint.sh entrypoint.sh
 
@@ -33,4 +41,10 @@ RUN chmod +x entrypoint.sh
 
 EXPOSE 9000
 
-ENTRYPOINT [ "./entrypoint.sh" ]
+ENTRYPOINT [ "sh" ]
+
+# ENTRYPOINT [ "./entrypoint.sh" ]
+
+
+# potential helper later on
+# RUN ln -sf /usr/bin/php83 /usr/bin/php || true
