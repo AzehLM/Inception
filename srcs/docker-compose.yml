@@ -61,9 +61,15 @@ services:
   #   depends_on:
   #     mariadb:
   #       condition: service_healthy
+  #   secrets:
+  #     - mariadb_database
+  #     - mariadb_user
+  #     - mariadb_password
+  #     - wp-superadmin-user
+  #   environment:
+  #     - DOMAIN=${DOMAIN}
 
 # Top-level ressources configuration
-
 volumes:
   mariadb_data:
     driver: local
@@ -82,8 +88,8 @@ networks:
   inception:
     driver: bridge
 
-# Secret files
 
+# Secret files
 secrets:
   mariadb_root_password:
     file: ../secrets/mariadb/db_root_password.txt
@@ -93,6 +99,8 @@ secrets:
     file: ../secrets/mariadb/db_user.txt
   mariadb_password:
     file: ../secrets/mariadb/db_password.txt
+  wp-superadmin-user:
+    file: ../secrets/wordpress/wp-superadmin-user.txt
   # commented for now because we're generation the certificate and the key at container creation
   # need to move it to Makefile, as first thing to do so it runs once and we don't recreate certification + key everytime the files are modified
   # Also will allow us to remove nginx Dockerfile dependencies -> will only have to mount files in the container.
