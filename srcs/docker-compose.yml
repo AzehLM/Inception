@@ -26,7 +26,7 @@ services:
     container_name: mariadb
     build: requirements/mariadb
     # On va delete les ports ouvert de tous les containers a l'exception de nginx, qui doit etre le seul port ouvert pour le rendu.
-    # On laisse les ports exposés dans les Dockerfile pour permettre au network ouvert via un bridge de communiqué entre containers et ca suffira
+    # On laisse les ports exposés dans les Dockerfile pour permettre au network ouvert via un bridge de communiquer entre containers et ca suffira
     # On laisse pour l'instant les ports ouverts pour pouvoir tester correctement nos contenaires independaments
     # ports:
     #   - "3306:3306"
@@ -57,6 +57,10 @@ services:
   #     - inception
   #   restart: always
   #   volumes:
+  #   # this depends_on configuration waits for the health check on mariadb to pass before starting wordpress
+  #   depends_on:
+  #     mariadb:
+  #       condition: service_healthy
 
 # Top-level ressources configuration
 
