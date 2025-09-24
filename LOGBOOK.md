@@ -39,7 +39,7 @@ The subject forbids `tail -f /dev/null` and so on is here to prevent us having c
 
 ## CGI (Common Gateway Interface)
 
-Standard allowing the communication between an HTTP server and external processes. Allows the web server to interact with different programming languages. It is an interface standardizing the transmission of requests between a web server and dynamic applications.
+A standard allowing the communication between an HTTP server and external processes. Allows the web server to interact with different programming languages. It is an interface standardizing the transmission of requests between a web server and dynamic applications.
 
 ## PHP-FPM
 
@@ -48,3 +48,13 @@ It creates a pool of PHP processes. When it gets a request, PHP-FPM chooses the 
 Different types of processes:
 - Master process: responsible for the management of the pool processes. It listens to the incoming requests and distributes them.
 - Worker processes: responsible for the execution of PHP scripts. Can run dynamically, statically or on demand. When a worker receives a request, it executes the PHP scripts and returns the output to the web server.
+
+
+## docker-compose file potential modifications
+
+- nginx
+    - ports: 127.0.0.1:443:443
+	- volumes: :ro pour read-only
+
+
+- rename wp-superadmin-user.txt file + change credentials
