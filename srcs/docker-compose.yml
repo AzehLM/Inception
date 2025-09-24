@@ -69,6 +69,30 @@ services:
   #   environment:
   #     - DOMAIN=${DOMAIN}
 
+  wordpress-dev:
+    container_name: wordpress-dev
+    build: requirements/wordpress
+    networks:
+      - inception
+    restart: unless-stopped
+    volumes:
+      - wordpress_data:/var/www/html
+      - ./requirements/wordpress/conf:/etc/php83/  # Mount configs for easy editing
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    secrets:
+      - mariadb_database
+      - mariadb_user
+      - mariadb_password
+      - wp-superadmin-user
+    environment:
+      - DOMAIN=${DOMAIN:-gueberso.42.fr}
+    # Override entrypoint for development - keeps container running
+    entrypoint: ["sh"]
+    stdin_open: true
+    tty: true
+
 # Top-level ressources configuration
 volumes:
   mariadb_data:
