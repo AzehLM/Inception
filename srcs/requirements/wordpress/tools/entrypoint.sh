@@ -1,36 +1,63 @@
 #!/bin/sh
 set -e
 
+MARIADB_DATABASE=$(cat /run/secrets/mariadb_database)
+MARIADB_PASSWORD=$(cat /run/secrets/mariadb_password)
+MARIADB_USER=$(cat /run/secrets/mariadb_user)
+WP_ADMIN_USER=$(cat /run/secrets/wp-superadmin-user)
 
 mkdir -p /var/www/html
-rm -rf /var/www/html/*
-
+chown -R www-data:www-data /var/www/html
 cd /var/www/html
 
-wp core download
+if [ ! -f wp-config.php ]; then
 
-# replace by looking into secrets files, right now not secured {cat secret/path/to/file/expected}
-# for now, --dbhost=3306:3306
-# tested, working if wordpress is on the same network as mariadb, otherwise its a mess
-wp config create \
-	--dbhost=mariadb:3306 \
-	--dbname=db \
-	--dbuser=mysql \
-	--dbpass=gueberso \
-	--allow-root
+    wp core download --allow-root
 
+    wp config create \
+        --dbhost=mariadb:3306 \
+        --dbname="$MARIADB_DATABASE" \
+        --dbuser="$MARIADB_USER" \
+        --dbpass="$MARIADB_PASSWORD" \
+        --allow-root
+
+    if ! wp core is-installed --allow-root; then
+            wp core install \
+                --url="https://$DOMAIN" \
+                --title="Fkin Website" \
+                --admin_user="$WP_ADMIN_USER" \
+                --admin_password="$MARIADB_PASSWORD" \
+                --admin_email="admin@$DOMAIN" \
+                --skip-email \
+                --allow-root
+        # Create a regular non-admin user
+        # wp user create \
+        #     regularuser \
+        #     "user@$DOMAIN" \
+        #     --user_pass="userpass123" \
+        #     --role=subscriber \
+        #     --allow-root
+
+        echo "WordPress installation completed!"
+    else
+        echo "WordPress already installed."
+    fi
+fi
+
+exec "$@"
+
+
+
+# old script
 # tested, good
-wp core install \
-	--url="https://$DOMAIN" \
-	--title="Temp" \
-	--admin_user="mysql" \
-	--admin_password="gueberso" \
-	--admin_email="temp@email.mail" \
-	--skip-email \
-	--allow-root
+# wp core install \
+# 	--url="https://$DOMAIN" \
+# 	--title="Temp" \
+# 	--admin_user="mysql" \
+# 	--admin_password="gueberso" \
+# 	--admin_email="temp@email.mail" \
+# 	--skip-email \
+# 	--allow-root
 
-# completly lost from here
 
 # Start php-fpm
-
-exec $@
