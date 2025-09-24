@@ -2,11 +2,11 @@ services:
   nginx:
     container_name: nginx
     build: requirements/nginx
-    # Need to had back 127.0.0.1 for safety. Removed it for now to test it on host machine
+    # Need to had back 127.0.0.1 for safety. Removed for now to test it on host machine
     ports:
-      - "443:443"
+      - "127.0.0.1:443:443"
     volumes:
-      - wordpress_data:/var/www/html
+      - wordpress_data:/var/www/html:ro # read-only access
       # - nginx:/usr/share/nginx/html
     # secrets:
     #   - ssl_certification
@@ -21,6 +21,9 @@ services:
       timeout: 3s # 3 seconde pour avoir un retour du test
       retries: 3 # autorise 3 retries avant de declarer le service unhealthy
       start_period: 5s # laisse 5 secondes au service pour ce lancer, ensuite le healthcheck est declencher
+    # depends_on:
+    #   wordpress-dev:
+    #     condition: service_started
 
   mariadb:
     container_name: mariadb
@@ -50,34 +53,15 @@ services:
       retries: 3
       start_period: 30s
 
-  # wordpress:
-  #   container_name: wordpress
-  #   build: requirements/wordpress
-  #   networks:
-  #     - inception
-  #   restart: always
-  #   volumes:
-  #   # this depends_on configuration waits for the health check on mariadb to pass before starting wordpress
-  #   depends_on:
-  #     mariadb:
-  #       condition: service_healthy
-  #   secrets:
-  #     - mariadb_database
-  #     - mariadb_user
-  #     - mariadb_password
-  #     - wp-superadmin-user
-  #   environment:
-  #     - DOMAIN=${DOMAIN}
-
-  wordpress-dev:
-    container_name: wordpress-dev
+  wordpress:
+    container_name: wordpress
     build: requirements/wordpress
     networks:
       - inception
-    restart: unless-stopped
+    restart: always
     volumes:
       - wordpress_data:/var/www/html
-      - ./requirements/wordpress/conf:/etc/php83/  # Mount configs for easy editing
+    # this depends_on configuration waits for the health check on mariadb to pass before starting wordpress
     depends_on:
       mariadb:
         condition: service_healthy
@@ -86,12 +70,10 @@ services:
       - mariadb_user
       - mariadb_password
       - wp-superadmin-user
-    environment:
-      - DOMAIN=${DOMAIN:-gueberso.42.fr}
-    # Override entrypoint for development - keeps container running
-    entrypoint: ["sh"]
-    stdin_open: true
-    tty: true
+    env_file: .env
+
+
+
 
 # Top-level ressources configuration
 volumes:
