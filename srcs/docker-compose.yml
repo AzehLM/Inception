@@ -2,37 +2,30 @@ services:
   nginx:
     container_name: nginx
     build: requirements/nginx
-    # Need to had back 127.0.0.1 for safety. Removed for now to test it on host machine
     ports:
-      - "127.0.0.1:443:443"
+      - "443:443"
     volumes:
-      - wordpress_data:/var/www/html:ro # read-only access
-      # - nginx:/usr/share/nginx/html
-    # secrets:
-    #   - ssl_certification
-    #   - ssl_key
+      - wordpress_data:/var/www/html
     networks:
       - inception
     init: true
     restart: always
     healthcheck:
-      test: ["CMD", "curl", "-k", "-f", "https://localhost:443/"] # -k ignore les erreurs de notre certificat autosigne, -f renvoie un code d'erreur different de 0
-      interval: 30s # tests effectuer toutes les 30s
-      timeout: 3s # 3 seconde pour avoir un retour du test
-      retries: 3 # autorise 3 retries avant de declarer le service unhealthy
-      start_period: 5s # laisse 5 secondes au service pour ce lancer, ensuite le healthcheck est declencher
-    # depends_on:
-    #   wordpress-dev:
-    #     condition: service_started
+      test: ["CMD", "curl", "-k", "-f", "https://localhost:443/"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 15s
+    depends_on:
+      wordpress:
+        condition: service_started
+    # secrets:
+    #   - ssl_certification
+    #   - ssl_key
 
   mariadb:
     container_name: mariadb
     build: requirements/mariadb
-    # On va delete les ports ouvert de tous les containers a l'exception de nginx, qui doit etre le seul port ouvert pour le rendu.
-    # On laisse les ports exposés dans les Dockerfile pour permettre au network ouvert via un bridge de communiquer entre containers et ca suffira
-    # On laisse pour l'instant les ports ouverts pour pouvoir tester correctement nos contenaires independaments
-    # ports:
-    #   - "3306:3306"
     volumes:
       - mariadb_data:/var/lib/mysql
       - ./requirements/mariadb/conf:/docker-entrypoint-initdb.d/
@@ -43,9 +36,7 @@ services:
       - mariadb_password
     networks:
       - inception
-    # doute sur le restart: always. Il y a restart: unless-stopped qui pourrait etre une solution.
     restart: always
-    # restart: unless-stopped
     healthcheck:
       test: ["CMD", "mariadb-admin", "ping", "-h", "localhost"]
       interval: 30s
@@ -61,7 +52,6 @@ services:
     restart: always
     volumes:
       - wordpress_data:/var/www/html
-    # this depends_on configuration waits for the health check on mariadb to pass before starting wordpress
     depends_on:
       mariadb:
         condition: service_healthy
@@ -71,8 +61,6 @@ services:
       - mariadb_password
       - wp-superadmin-user
     env_file: .env
-
-
 
 
 # Top-level ressources configuration
@@ -97,14 +85,14 @@ networks:
 
 # Secret files
 secrets:
-  mariadb_root_password:
-    file: ../secrets/mariadb/db_root_password.txt
   mariadb_database:
-    file: ../secrets/mariadb/db_name.txt
-  mariadb_user:
-    file: ../secrets/mariadb/db_user.txt
+    file: ../secrets/mariadb/mariadb_database.txt
   mariadb_password:
-    file: ../secrets/mariadb/db_password.txt
+    file: ../secrets/mariadb/mariadb_password.txt
+  mariadb_root_password:
+    file: ../secrets/mariadb/mariadb_root_password.txt
+  mariadb_user:
+    file: ../secrets/mariadb/mariadb_user.txt
   wp-superadmin-user:
     file: ../secrets/wordpress/wp-superadmin-user.txt
   # commented for now because we're generation the certificate and the key at container creation
