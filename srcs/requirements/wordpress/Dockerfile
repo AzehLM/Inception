@@ -9,6 +9,7 @@ RUN apk add --no-cache \
 	php83 \
 	php83-phar \
 	php83-fpm \
+	mariadb-client \
 	# connect for Wordpress to connect to mariadb
 	# if it doesnt work change or add mysqlnd, should work together
 	php83-mysqli \
