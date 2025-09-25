@@ -58,3 +58,7 @@ Different types of processes:
 
 
 - rename wp-superadmin-user.txt file + change credentials
+
+
+
+### Implementation choices
