@@ -48,16 +48,3 @@ exec "$@"
 
 
 
-# old script
-# tested, good
-# wp core install \
-# 	--url="https://$DOMAIN" \
-# 	--title="Temp" \
-# 	--admin_user="mysql" \
-# 	--admin_password="gueberso" \
-# 	--admin_email="temp@email.mail" \
-# 	--skip-email \
-# 	--allow-root
-
-
-# Start php-fpm
