@@ -2,10 +2,10 @@
 set -e
 
 # Read secrets from files
-MARIADB_ROOT_PASSWORD=$(cat /run/secrets/mariadb_root_password)
 MARIADB_DATABASE=$(cat /run/secrets/mariadb_database)
-MARIADB_USER=$(cat /run/secrets/mariadb_user)
 MARIADB_PASSWORD=$(cat /run/secrets/mariadb_password)
+MARIADB_ROOT_PASSWORD=$(cat /run/secrets/mariadb_root_password)
+MARIADB_USER=$(cat /run/secrets/mariadb_user)
 
 # Export for envsubst
 export MARIADB_ROOT_PASSWORD

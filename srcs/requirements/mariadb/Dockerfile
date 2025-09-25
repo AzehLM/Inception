@@ -2,7 +2,9 @@
 
 FROM alpine:3.21
 
-RUN apk add --no-cache mariadb mariadb-client su-exec
+RUN apk add --no-cache mariadb mariadb-client su-exec envsubst
+
+COPY conf/mariadb-server.cnf /etc/my.cnf.d/mariadb-server.cnf
 
 VOLUME /var/lib/mysql
 
