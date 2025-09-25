@@ -8,7 +8,7 @@ RUN apk add --no-cache \
 	php83-phar \
 	php83-fpm \
 	php83-mysqli \
-	# handle multibty string, required by Wordpress
+	# handle multibyte string, required by WordPress
 	php83-mbstring \
 	# performance improvement
 	php83-opcache \
