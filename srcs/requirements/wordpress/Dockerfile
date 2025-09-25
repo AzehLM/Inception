@@ -36,14 +36,14 @@ RUN wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.ph
 	&& chmod +x wp-cli.phar \
 	&& mv wp-cli.phar /usr/local/bin/wp
 
-COPY conf/www.conf /etc/php83/www.conf
+COPY conf/www.conf /etc/php83/php-fpm.d/www.conf
 COPY tools/entrypoint.sh entrypoint.sh
 
 RUN chmod +x entrypoint.sh
 
-RUN adduser -D -S -G www-data -u 82 www-data
-
 EXPOSE 9000
+
+RUN adduser -D -S -G www-data -u 82 www-data
 
 ENTRYPOINT [ "./entrypoint.sh" ]
 
