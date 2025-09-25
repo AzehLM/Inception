@@ -41,9 +41,9 @@ COPY tools/entrypoint.sh entrypoint.sh
 
 RUN chmod +x entrypoint.sh
 
-EXPOSE 9000
-
 RUN adduser -D -S -G www-data -u 82 www-data
+
+EXPOSE 9000
 
 ENTRYPOINT [ "./entrypoint.sh" ]
 
