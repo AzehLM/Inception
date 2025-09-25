@@ -5,7 +5,7 @@ services:
     ports:
       - "443:443"
     volumes:
-      - wordpress_data:/var/www/html
+      - wordpress_data:/var/www/html:ro
     networks:
       - inception
     init: true
@@ -59,7 +59,7 @@ services:
       - mariadb_database
       - mariadb_user
       - mariadb_password
-      - wp-superadmin-user
+      - wp_admin
     env_file: .env
 
 
@@ -93,8 +93,8 @@ secrets:
     file: ../secrets/mariadb/mariadb_root_password.txt
   mariadb_user:
     file: ../secrets/mariadb/mariadb_user.txt
-  wp-superadmin-user:
-    file: ../secrets/wordpress/wp-superadmin-user.txt
+  wp_admin:
+    file: ../secrets/wordpress/wp_admin.txt
   # commented for now because we're generation the certificate and the key at container creation
   # need to move it to Makefile, as first thing to do so it runs once and we don't recreate certification + key everytime the files are modified
   # Also will allow us to remove nginx Dockerfile dependencies -> will only have to mount files in the container.
