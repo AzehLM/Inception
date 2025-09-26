@@ -1,3 +1,5 @@
+DOMAIN			:= gueberso.42.fr
+
 SECRETS_PATH	:= secrets/ssl/
 CERT_PATH		:= $(SECRETS_PATH)cert.pem
 KEY_PATH		:= $(SECRETS_PATH)key.pem
@@ -5,13 +7,15 @@ KEY_PATH		:= $(SECRETS_PATH)key.pem
 COMPOSE_FILE	:= srcs/docker-compose.yml
 COMPOSE_CMD		:= docker compose -f $(COMPOSE_FILE)
 
+DETACH			:= -d
+
 DATA_DIR		:= /home/gueberso/data
 MARIADB_DIR		:= $(DATA_DIR)/mariadb
 WORDPRESS_DIR	:= $(DATA_DIR)/wordpress
 
 export DOCKER_BUILDKIT=1
 
-.DEFAULT_GOAL	:= build
+.DEFAULT_GOAL	:= up
 
 .PHONY: all
 all: ssl dirs build up
@@ -20,12 +24,12 @@ dirs:
 	@mkdir -p $(MARIADB_DIR)
 	@mkdir -p $(WORDPRESS_DIR)
 
-build: ssl dirs
+build: $(CERT_PATH) $(KEY_PATH) dirs
 	$(COMPOSE_CMD) build
 
 # Start all services (build if necessary)
-up: ssl dirs
-	$(COMPOSE_CMD) up -d --build
+up: $(CERT_PATH) $(KEY_PATH) dirs
+	$(COMPOSE_CMD) up $(DETACH) --build
 
 # Stop all services without removing containers
 stop:
@@ -77,7 +81,7 @@ exec:
 	@if [ -z "$(SERVICE)" ]; then \
 		echo "Error: Please specify SERVICE. Usage: make exec SERVICE=nginx$(NC)"; \
 	else \
-		docker-compose -f $(COMPOSE_FILE) exec $(SERVICE) /bin/sh; \
+		docker compose -f $(COMPOSE_FILE) exec $(SERVICE) /bin/sh; \
 	fi
 
 restart:
@@ -88,6 +92,6 @@ restart:
 ssl: $(CERT_PATH) $(KEY_PATH)
 
 $(CERT_PATH) $(KEY_PATH): | $(SECRETS_PATH)
-	openssl req -x509 -newkey rsa:4096 -sha256 -days 365 -nodes \
-	-subj "/C=EN/ST=France/L=Lyon/O=42Lyon/OU=DevOps/CN=$(DOMAIN)" \
+	@openssl req -x509 -newkey rsa:4096 -sha256 -days 365 -nodes \
+	-subj "/C=FR/ST=France/L=Lyon/O=42Lyon/OU=DevOps/CN=$(DOMAIN)" \
 	-keyout $(KEY_PATH) -out $(CERT_PATH)
