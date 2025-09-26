@@ -2,12 +2,14 @@ services:
   nginx:
     container_name: nginx
     build: requirements/nginx
+    # testing 127.0.0.1 port
     ports:
-      - "443:443"
+      - "127.0.0.1:443:443"
     volumes:
       - wordpress_data:/var/www/html:ro
     networks:
       - inception
+    # runs tini as foreground process
     init: true
     restart: always
     healthcheck:
@@ -19,9 +21,9 @@ services:
     depends_on:
       wordpress:
         condition: service_started
-    # secrets:
-    #   - ssl_certification
-    #   - ssl_key
+    secrets:
+      - ssl_certificate
+      - ssl_key
 
   mariadb:
     container_name: mariadb
@@ -78,12 +80,12 @@ volumes:
       o: bind
       device: /home/gueberso/data/wordpress
 
+
 networks:
   inception:
     driver: bridge
 
 
-# Secret files
 secrets:
   mariadb_database:
     file: ../secrets/mariadb/mariadb_database.txt
@@ -95,10 +97,7 @@ secrets:
     file: ../secrets/mariadb/mariadb_user.txt
   wp_admin:
     file: ../secrets/wordpress/wp_admin.txt
-  # commented for now because we're generation the certificate and the key at container creation
-  # need to move it to Makefile, as first thing to do so it runs once and we don't recreate certification + key everytime the files are modified
-  # Also will allow us to remove nginx Dockerfile dependencies -> will only have to mount files in the container.
-  # ssl_certification:
-  #   file: ../secrets/ssl/gueberso.42.fr.crt
-  # ssl_key:
-  #   file: ../secrets/ssl/gueberso.42.fr.key
+  ssl_certificate:
+    file: ../secrets/ssl/cert.pem
+  ssl_key:
+    file: ../secrets/ssl/key.pem
