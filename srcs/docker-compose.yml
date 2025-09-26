@@ -68,12 +68,14 @@ services:
 # Top-level ressources configuration
 volumes:
   mariadb_data:
+    name: mariadb
     driver: local
     driver_opts:
       type: none
       o: bind
       device: /home/gueberso/data/mariadb
   wordpress_data:
+    name: wordpress
     driver: local
     driver_opts:
       type: none
