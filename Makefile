@@ -7,8 +7,6 @@ KEY_PATH		:= $(SECRETS_PATH)key.pem
 COMPOSE_FILE	:= srcs/docker-compose.yml
 COMPOSE_CMD		:= docker compose -f $(COMPOSE_FILE)
 
-DETACH			:= -d
-
 DATA_DIR		:= /home/gueberso/data
 MARIADB_DIR		:= $(DATA_DIR)/mariadb
 WORDPRESS_DIR	:= $(DATA_DIR)/wordpress
@@ -17,34 +15,33 @@ export DOCKER_BUILDKIT=1
 
 .DEFAULT_GOAL	:= up
 
-.PHONY: all
-all: ssl dirs build up
-
+.PHONY: dirs
 dirs:
 	@mkdir -p $(MARIADB_DIR)
 	@mkdir -p $(WORDPRESS_DIR)
 
+.PHONY: build
 build: $(CERT_PATH) $(KEY_PATH) dirs
 	$(COMPOSE_CMD) build
 
-# Start all services (build if necessary)
+.PHONY: up
 up: $(CERT_PATH) $(KEY_PATH) dirs
-	$(COMPOSE_CMD) up $(DETACH) --build
+	$(COMPOSE_CMD) up -d
 
-# Stop all services without removing containers
+.PHONY: stop
 stop:
 	$(COMPOSE_CMD) stop
 
-# Stop and remove containers, networks
+.PHONY: down
 down:
 	$(COMPOSE_CMD) down
 
-# Clean: stop and remove containers, networks, and anonymous volumes
+.PHONY: clean
 clean: down
 	$(COMPOSE_CMD) down -v
 	@docker system prune -f
 
-# Full clean: remove everything including images and named volumes
+.PHONY: fclean
 fclean: clean
 	$(COMPOSE_CMD) down -v --rmi all
 	@if [ -n "$$(docker volume ls -q)" ]; then \
@@ -53,37 +50,40 @@ fclean: clean
 	@if [ -n "$$(docker images -q)" ]; then \
 		docker rmi -f $$(docker images -q) 2>/dev/null || true; \
 	fi
-	@docker system prune -a -f --volumes
+	@docker system prune -af --volumes
+	@rm -rf $(SECRETS_PATH)*
 	@sudo rm -rf $(DATA_DIR)
 
-# Restart everything
+.PHONY: re
 re: down
 	$(MAKE) build
 	$(MAKE) up
 
-# Show logs from all services
+.PHONY: logs
 logs:
-	$(COMPOSE_CMD) logs -f
+	$(COMPOSE_CMD) logs
 
-# Show logs from a specific service (usage: make logs-service SERVICE=nginx)
+.PHONY: logs-service
 logs-service:
-	@if [ -z "$(SERVICE)" ]; then \
+	@if [ -z "$(word 2,$(MAKECMDGOALS))" ]; then \
+		echo "Error: Please specify service. Usage: make logs-service service_name"; \
 	else \
-		docker-compose -f $(COMPOSE_FILE) logs -f $(SERVICE); \
+		docker compose -f $(COMPOSE_FILE) logs $(word 2,$(MAKECMDGOALS)); \
 	fi
 
-# Show status of all services
-status:
-	$(COMPOSE_CMD) ps
-
-# Enter a running container (usage: make exec SERVICE=nginx)
+.PHONY: exec
 exec:
-	@if [ -z "$(SERVICE)" ]; then \
-		echo "Error: Please specify SERVICE. Usage: make exec SERVICE=nginx$(NC)"; \
+	@if [ -z "$(word 2,$(MAKECMDGOALS))" ]; then \
+		echo "Error: Please specify SERVICE. Usage: make exec service_name"; \
 	else \
 		docker compose -f $(COMPOSE_FILE) exec $(SERVICE) /bin/sh; \
 	fi
 
+.PHONY: status
+status:
+	$(COMPOSE_CMD) ps
+
+.PHONY: restart
 restart:
 	$(COMPOSE_FILE) restart
 
@@ -95,3 +95,9 @@ $(CERT_PATH) $(KEY_PATH): | $(SECRETS_PATH)
 	@openssl req -x509 -newkey rsa:4096 -sha256 -days 365 -nodes \
 	-subj "/C=FR/ST=France/L=Lyon/O=42Lyon/OU=DevOps/CN=$(DOMAIN)" \
 	-keyout $(KEY_PATH) -out $(CERT_PATH)
+
+
+# For any target not explicitly defined elsewhere, do nothing and consider it successful.
+# Define dummy targets for any argument passed to logs-service and exec, to prevent Make errors
+%:
+	@:
