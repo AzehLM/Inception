@@ -2,10 +2,10 @@ services:
   nginx:
     container_name: nginx
     build: requirements/nginx
-    # testing 127.0.0.1 port
+    # Removed 127.0.0.1 port until im done testing things
     ports:
-      - "127.0.0.1:443:443"
-      - "127.0.0.1:8443:8443"
+      - "443:443"
+      - "8443:8443"
     volumes:
       - wordpress_data:/var/www/html:ro
     networks:
