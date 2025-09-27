@@ -52,9 +52,11 @@ Different types of processes:
 
 ## docker-compose file potential modifications
 
-- nginx
-    - ports: 127.0.0.1:443:443
-	- volumes: :ro pour read-only
+
 
 
 - rename wp-superadmin-user.txt file + change credentials
+- nginx default.conf file -> maybe delete some, everything is not interesting and/or useful
+
+
+### Implementation choices

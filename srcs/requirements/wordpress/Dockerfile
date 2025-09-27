@@ -3,14 +3,11 @@
 FROM alpine:3.21
 
 RUN apk add --no-cache \
-	# process manager needed for nginx to serve php
 	php83 \
 	php83-phar \
 	php83-fpm \
 	php83-mysqli \
-	# handle multibyte string, required by WordPress
 	php83-mbstring \
-	# performance improvement
 	php83-opcache \
 	# importing redis since we'll need to for the bonus service
 	redis \
@@ -36,6 +33,3 @@ RUN adduser -D -S -G www-data -u 82 www-data
 ENTRYPOINT [ "./entrypoint.sh" ]
 
 CMD ["php-fpm83", "-F"]
-
-# potential helper later on
-# RUN ln -sf /usr/bin/php83 /usr/bin/php || true
