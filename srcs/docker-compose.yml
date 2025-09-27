@@ -5,6 +5,7 @@ services:
     # testing 127.0.0.1 port
     ports:
       - "127.0.0.1:443:443"
+      - "127.0.0.1:8443:8443"
     volumes:
       - wordpress_data:/var/www/html:ro
     networks:
@@ -20,6 +21,8 @@ services:
       start_period: 15s
     depends_on:
       wordpress:
+        condition: service_started
+      website:
         condition: service_started
     secrets:
       - ssl_certificate
@@ -72,11 +75,6 @@ services:
     networks:
       - inception
     restart: unless-stopped
-    ports:
-      - "127.0.0.1:8443:8443"
-    depends_on:
-      nginx:
-        condition: service_started
 
 volumes:
   mariadb_data:
