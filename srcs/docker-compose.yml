@@ -65,7 +65,6 @@ services:
     env_file: .env
 
 
-# Top-level ressources configuration
 volumes:
   mariadb_data:
     name: mariadb

@@ -1,7 +1,6 @@
 #!/bin/sh
 set -e
 
-# Read secrets from files
 MARIADB_DATABASE=$(cat /run/secrets/mariadb_database)
 MARIADB_PASSWORD=$(cat /run/secrets/mariadb_password)
 MARIADB_ROOT_PASSWORD=$(cat /run/secrets/mariadb_root_password)
