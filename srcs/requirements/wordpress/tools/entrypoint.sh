@@ -5,6 +5,7 @@ MARIADB_DATABASE=$(cat /run/secrets/mariadb_database)
 MARIADB_PASSWORD=$(cat /run/secrets/mariadb_password)
 MARIADB_USER=$(cat /run/secrets/mariadb_user)
 WP_ADMIN_USER=$(cat /run/secrets/wp_admin)
+PUBLIC_USER_PASSWORD=$(cat /run/secrets/wp_public_user_password)
 
 mkdir -p /var/www/html
 chown -R www-data:www-data /var/www/html
@@ -34,7 +35,7 @@ if [ ! -f wp-config.php ]; then
             wp user create \
                 public_user \
                 "public_user@$DOMAIN" \
-                --user_pass="42" \
+                --user_pass="$PUBLIC_USER_PASSWORD" \
                 --role=subscriber \
                 --allow-root
 
