@@ -60,3 +60,6 @@ Different types of processes:
 
 
 ### Implementation choices
+
+
+[Funny documentation about HTML/TLS](https://howhttps.works/https-ssl-tls-differences/)
