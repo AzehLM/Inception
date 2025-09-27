@@ -1,0 +1,224 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Favorit,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #333;
+}
+
+.container {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+    transition: all 0.5s ease;
+}
+
+.profile-photo {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #667eea;
+    margin-bottom: 30px;
+    transition: transform 0.3s ease;
+}
+
+.profile-photo:hover {
+    transform: scale(1.05);
+}
+
+h1 {
+    color: #333;
+    margin-bottom: 30px;
+    font-size: 1.8rem;
+    font-weight: 300;
+}
+
+.pros-cons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 40px;
+    text-align: left;
+}
+
+.pros, .cons {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    transition: transform 0.2s ease;
+}
+
+.pros:hover, .cons:hover {
+    transform: translateY(-2px);
+}
+
+.pros h3 {
+    color: #28a745;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+}
+
+.cons h3 {
+    color: #dc3545;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+}
+
+.pros ul, .cons ul {
+    list-style: none;
+}
+
+.pros li:before {
+    content: "✓ ";
+    color: #28a745;
+    font-weight: bold;
+}
+
+.cons li:before {
+    content: "✗ ";
+    color: #dc3545;
+    font-weight: bold;
+}
+
+li {
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+
+.question {
+    font-size: 1.3rem;
+    margin-bottom: 30px;
+    color: #555;
+    font-weight: 500;
+}
+
+.buttons {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+}
+
+button {
+    padding: 15px 30px;
+    border: none;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 100px;
+}
+
+.yes-btn {
+    background: #28a745;
+    color: white;
+}
+
+.yes-btn:hover {
+    background: #218838;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+}
+
+.no-btn {
+    background: #dc3545;
+    color: white;
+}
+
+.no-btn:hover {
+    background: #c82333;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(220, 53, 69, 0.3);
+}
+
+.voting-section {
+    transition: all 0.6s ease;
+}
+
+.thanks-section {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s ease;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) translateY(30px);
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    min-width: 400px;
+}
+
+.thanks-section.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) translateY(0);
+}
+
+.thanks-section h2 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+}
+
+.thanks-section p {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    line-height: 1.6;
+}
+
+.small-text {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    font-style: italic;
+}
+
+.reset-btn {
+    background: white;
+    color: #28a745;
+    margin-top: 20px;
+    border: 2px solid white;
+}
+
+.reset-btn:hover {
+    background: transparent;
+    color: white;
+    border-color: white;
+}
+
+.hidden {
+    opacity: 0;
+    transform: scale(0.9);
+    pointer-events: none;
+}
+
+@media (max-width: 600px) {
+    .pros-cons {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .thanks-section {
+        min-width: 90%;
+        padding: 30px 20px;
+    }
+}
