@@ -3,11 +3,11 @@ export DOCKER_BUILDKIT=1
 COMPOSE_FILE	:= srcs/docker-compose.yml
 COMPOSE_CMD		:= docker compose -f $(COMPOSE_FILE)
 
-DOMAIN			:= gueberso.42.fr
+DOMAIN_NAME		:= gueberso.42.fr
 
 DATA_DIR		:= $(HOME)/data/
-MARIADB_DIR		:= $(DATA_DIR)/mariadb
-WORDPRESS_DIR	:= $(DATA_DIR)/wordpress
+MARIADB_DIR		:= $(DATA_DIR)mariadb
+WORDPRESS_DIR	:= $(DATA_DIR)wordpress
 
 VOLUMES 		:= \
 	mariadb \
@@ -19,16 +19,16 @@ $(MARIADB_DIR):
 $(WORDPRESS_DIR):
 	mkdir -p $@
 
-$(SECRETS_PATH):
-	mkdir -p $@
-
 SECRETS_PATH	:= secrets/ssl/
 CERT_PATH		:= $(SECRETS_PATH)cert.pem
 KEY_PATH		:= $(SECRETS_PATH)key.pem
 
+$(SECRETS_PATH):
+	mkdir -p $@
+
 $(CERT_PATH) $(KEY_PATH): | $(SECRETS_PATH)
 	@openssl req -x509 -newkey rsa:4096 -sha256 -days 365 -nodes \
-	-subj "/C=FR/ST=France/L=Lyon/O=42Lyon/OU=DevOps/CN=$(DOMAIN)" \
+	-subj "/C=FR/ST=France/L=Lyon/O=42Lyon/OU=DevOps/CN=$(DOMAIN_NAME)" \
 	-keyout $(KEY_PATH) -out $(CERT_PATH)
 
 .DEFAULT_GOAL	:= up
