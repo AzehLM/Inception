@@ -10,7 +10,7 @@ services:
       - wordpress_data:/var/www/html:ro
     networks:
       - inception
-    # runs tini as foreground process
+    # run tini as foreground process
     init: true
     restart: always
     healthcheck:
@@ -66,7 +66,8 @@ services:
       - mariadb_password
       - wp_admin
       - wp_public_user_password
-    env_file: .env
+    environment:
+      - DOMAIN=${DOMAIN}
 
   website:
     container_name: website
@@ -83,6 +84,25 @@ services:
     networks:
       - inception
     restart: always
+
+  vsftpd:
+    container_name: vsftpd
+    build: requirements/bonus/vsftpd
+    # new network probably ? will see
+    networks:
+    restart: always
+    # depending on the network maybe only need to EXPOSE it
+    ports:
+      - "21:21"
+    environment:
+      - FTP_USER=${FTP_USER}
+      - FTP_PASS=${FTP_PASS}
+    # tired will check later, need to find more doc anyway
+    volumes:
+      - something:somewhere
+    depends_on:
+      wordpress:
+        condition: service_started
 
 volumes:
   mariadb_data:
