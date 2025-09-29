@@ -102,8 +102,17 @@ sudo sysctl -p
 > Redis needs this setting to allow the kernel to allocate more memory than physically available to ensure background saving (RDB snapshots) or replication can work reliably even under memory pressure.
 
 > Explanation of Memory Overcommit
+
 > Memory Overcommit determines how the Linux kernel handles memory allocation requests that exceed total available RAM.
 
 > When set to 0 (default), the kernel is conservative and may deny allocations that exceed physical RAM, which can cause Redis background processes to fail.
 
 > When set to 1, the kernel allows allocating more memory than physically available, improving Redis reliability during operations needing extra memory temporarily.
+
+
+
+Prometheus/Grafana/cAdvisor:
+
+https://mobisoftinfotech.com/resources/blog/docker-container-monitoring-prometheus-grafana
+https://www.virtana.com/glossary/what-is-a-tar-cadvisor-container-advisor/#:~:text=cAdvisor%20(Container%20Advisor)%20is%20an,performance%20metrics%20from%20running%20containers.
+https://signoz.io/guides/how-to-install-prometheus-and-grafana-on-docker/ -> looks fucking amazing for the whole
