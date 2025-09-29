@@ -76,6 +76,14 @@ services:
       - inception
     restart: unless-stopped
 
+  redis:
+    container_name: redis
+    build: requirements/bonus/redis
+    init: true
+    networks:
+      - inception
+    restart: always
+
 volumes:
   mariadb_data:
     name: mariadb

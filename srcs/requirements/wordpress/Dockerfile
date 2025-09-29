@@ -9,10 +9,11 @@ RUN apk add --no-cache \
 	php83-mysqli \
 	php83-mbstring \
 	php83-opcache \
-	# importing redis since we'll need to for the bonus service
+	# redis requirements
 	redis \
-	# native PHP support to connect to Redis servers
-	php83-redis
+	php83-ctype \
+	php83-redis \
+	php83-tokenizer
 
 # necessary to avoid wp core download fail
 RUN echo "memory_limit = 256M" >> /etc/php83/php.ini
