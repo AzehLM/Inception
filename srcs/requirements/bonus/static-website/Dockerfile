@@ -1,8 +1,7 @@
 FROM alpine:3.21
 
 RUN apk add --no-cache \
-	busybox-extras \
-	darkhttpd
+	busybox-extras
 
 WORKDIR /var/www
 
