@@ -11,7 +11,7 @@ COPY tools/entrypoint.sh entrypoint.sh
 RUN chmod +x entrypoint.sh
 
 EXPOSE 21
-#not sure this one is needed for now
+#not sure this one is needed for now, if it is remember to EXPOSE on the same layer !!!
 EXPOSE 21000
 
 ENTRYPOINT ["./entrypoint.sh"]
