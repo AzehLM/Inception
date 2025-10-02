@@ -8,7 +8,6 @@ WP_ADMIN_USER=$(cat /run/secrets/wp_admin)
 PUBLIC_USER_PASSWORD=$(cat /run/secrets/wp_public_user_password)
 
 mkdir -p /var/www/html
-chown -R www-data:www-data /var/www/html
 cd /var/www/html
 
 if [ ! -f wp-config.php ]; then
@@ -43,6 +42,15 @@ if [ ! -f wp-config.php ]; then
     else
         echo "WordPress already installed."
     fi
+
+    wp config set WP_REDIS_HOST 'redis' --allow-root
+    wp config set WP_REDIS_PORT 6379 --raw --allow-root
+    wp plugin install redis-cache --activate --allow-root
+    wp redis enable --allow-root
+
+    echo "redis-cache configuration done."
 fi
+
+chown -R www-data:www-data /var/www/html
 
 exec "$@"

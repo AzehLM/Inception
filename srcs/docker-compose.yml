@@ -2,14 +2,14 @@ services:
   nginx:
     container_name: nginx
     build: requirements/nginx
-    # testing 127.0.0.1 port
+    # Removed 127.0.0.1 port until im done testing things
     ports:
-      - "127.0.0.1:443:443"
+      - "443:443"
     volumes:
       - wordpress_data:/var/www/html:ro
     networks:
-      - inception
-    # runs tini as foreground process
+      - wordpress
+      - adminer
     init: true
     restart: always
     healthcheck:
@@ -20,6 +20,8 @@ services:
       start_period: 15s
     depends_on:
       wordpress:
+        condition: service_started
+      website:
         condition: service_started
     secrets:
       - ssl_certificate
@@ -37,7 +39,7 @@ services:
       - mariadb_user
       - mariadb_password
     networks:
-      - inception
+      - database
     restart: always
     healthcheck:
       test: ["CMD", "mariadb-admin", "ping", "-h", "localhost"]
@@ -50,7 +52,8 @@ services:
     container_name: wordpress
     build: requirements/wordpress
     networks:
-      - inception
+      - wordpress
+      - database
     restart: always
     volumes:
       - wordpress_data:/var/www/html
@@ -63,8 +66,55 @@ services:
       - mariadb_password
       - wp_admin
       - wp_public_user_password
-    env_file: .env
+    environment:
+      - DOMAIN=${DOMAIN}
 
+  website:
+    container_name: website
+    build: requirements/bonus/static-website
+    init: true
+    networks:
+      - wordpress
+    restart: unless-stopped
+
+  redis:
+    container_name: redis
+    build: requirements/bonus/redis
+    init: true
+    networks:
+      - wordpress
+    restart: always
+    depends_on:
+      wordpress:
+        condition: service_started
+
+  vsftpd:
+    container_name: vsftpd
+    build: requirements/bonus/vsftpd
+    networks:
+      - wordpress
+    restart: always
+    ports:
+      - "21:21"
+    environment:
+      - FTP_USER=${FTP_USER}
+      - FTP_PASS=${FTP_PASS}
+    volumes:
+      - wordpress_data:/var/www/html
+    depends_on:
+      wordpress:
+        condition: service_started
+
+  adminer:
+    container_name: adminer
+    build: requirements/bonus/adminer
+    networks:
+      - database
+      - adminer
+    restart: always
+    depends_on:
+      mariadb:
+        condition: service_healthy
 
 volumes:
   mariadb_data:
@@ -84,9 +134,13 @@ volumes:
 
 
 networks:
-  inception:
+  database:
     driver: bridge
-
+    internal: true
+  wordpress:
+    driver: bridge
+  adminer:
+    driver: bridge
 
 secrets:
   mariadb_database:
