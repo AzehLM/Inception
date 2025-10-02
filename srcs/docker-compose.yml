@@ -10,7 +10,6 @@ services:
       - wordpress_data:/var/www/html:ro
     networks:
       - inception
-    # run tini as foreground process
     init: true
     restart: always
     healthcheck:
@@ -90,16 +89,15 @@ services:
     build: requirements/bonus/vsftpd
     # new network probably ? will see
     networks:
+      - inception
     restart: always
-    # depending on the network maybe only need to EXPOSE it
     ports:
       - "21:21"
     environment:
       - FTP_USER=${FTP_USER}
       - FTP_PASS=${FTP_PASS}
-    # tired will check later, need to find more doc anyway
     volumes:
-      - something:somewhere
+      - wordpress_data:/var/www/html
     depends_on:
       wordpress:
         condition: service_started
