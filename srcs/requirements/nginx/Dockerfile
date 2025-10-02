@@ -6,9 +6,11 @@ FROM alpine:3.21
 RUN apk add --no-cache nginx curl
 
 COPY conf/nginx.conf /etc/nginx/nginx.conf
-COPY conf/default.conf /etc/nginx/http.d/
+COPY conf/services.conf /etc/nginx/http.d/
 
-COPY conf/website.conf /etc/nginx/http.d/
+RUN mkdir -p /etc/nginx/locations
+
+COPY conf/locations/*.inc /etc/nginx/locations/
 
 EXPOSE 443
 

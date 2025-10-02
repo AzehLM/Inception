@@ -5,11 +5,11 @@ services:
     # Removed 127.0.0.1 port until im done testing things
     ports:
       - "443:443"
-      - "8443:8443"
     volumes:
       - wordpress_data:/var/www/html:ro
     networks:
       - wordpress
+      - adminer
     init: true
     restart: always
     healthcheck:
@@ -110,9 +110,8 @@ services:
     build: requirements/bonus/adminer
     networks:
       - database
+      - adminer
     restart: always
-    ports:
-      - 8080:8080
     depends_on:
       mariadb:
         condition: service_healthy
@@ -137,8 +136,10 @@ volumes:
 networks:
   database:
     driver: bridge
-    # internal: true
+    internal: true
   wordpress:
+    driver: bridge
+  adminer:
     driver: bridge
 
 secrets:
