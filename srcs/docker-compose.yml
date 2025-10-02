@@ -83,6 +83,7 @@ services:
     init: true
     networks:
       - wordpress
+      - database
     restart: always
     depends_on:
       wordpress:
@@ -116,6 +117,36 @@ services:
       mariadb:
         condition: service_healthy
 
+  cadvisor:
+    container_name: cadvisor
+    build: requirements/bonus/cadvisor
+    # network for later nginx implementation
+    networks:
+      - wordpress
+      - monitoring
+    restart: always
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro   
+    ports:
+      - 8070:8080
+
+  # prometheus:
+  #   container_name: prometheus
+  #   build: requirements/bonus/prometheus
+  #   # ports:
+  #   # - 9090:9090
+  #   volumes:
+  #   - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+  #   depends_on:
+  #     cadvisor:
+  #       condition: service_started
+  #   networks:
+  #     - monitoring
+
 volumes:
   mariadb_data:
     name: mariadb
@@ -141,6 +172,10 @@ networks:
     driver: bridge
   adminer:
     driver: bridge
+  # commented internal right now, will see if its ok when location added to nginx config files
+  monitoring:
+    driver: bridge
+    # internal: true
 
 secrets:
   mariadb_database:
