@@ -36,13 +36,9 @@ $(CERT_PATH) $(KEY_PATH): | $(SECRETS_PATH)
 .PHONY: dirs
 dirs: $(MARIADB_DIR) $(WORDPRESS_DIR)
 
-.PHONY: build
-build: $(CERT_PATH) $(KEY_PATH) dirs
-	$(COMPOSE_CMD) build
-
 .PHONY: up
 up: $(CERT_PATH) $(KEY_PATH) dirs
-	$(COMPOSE_CMD) up -d
+	$(COMPOSE_CMD) up -d --build
 
 .PHONY: stop
 stop:
@@ -64,7 +60,6 @@ fclean: clean
 
 .PHONY: re
 re: down
-	$(MAKE) build
 	$(MAKE) up
 
 .PHONY: logs
