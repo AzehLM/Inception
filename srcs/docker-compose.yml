@@ -9,7 +9,7 @@ services:
     volumes:
       - wordpress_data:/var/www/html:ro
     networks:
-      - inception
+      - wordpress
     init: true
     restart: always
     healthcheck:
@@ -39,7 +39,7 @@ services:
       - mariadb_user
       - mariadb_password
     networks:
-      - inception
+      - database
     restart: always
     healthcheck:
       test: ["CMD", "mariadb-admin", "ping", "-h", "localhost"]
@@ -52,7 +52,8 @@ services:
     container_name: wordpress
     build: requirements/wordpress
     networks:
-      - inception
+      - wordpress
+      - database
     restart: always
     volumes:
       - wordpress_data:/var/www/html
@@ -73,7 +74,7 @@ services:
     build: requirements/bonus/static-website
     init: true
     networks:
-      - inception
+      - wordpress
     restart: unless-stopped
 
   redis:
@@ -81,7 +82,7 @@ services:
     build: requirements/bonus/redis
     init: true
     networks:
-      - inception
+      - wordpress
     restart: always
 
   vsftpd:
@@ -89,7 +90,7 @@ services:
     build: requirements/bonus/vsftpd
     # new network probably ? will see
     networks:
-      - inception
+      - wordpress
     restart: always
     ports:
       - "21:21"
@@ -120,9 +121,10 @@ volumes:
 
 
 networks:
-  inception:
+  database:
     driver: bridge
-
+  wordpress:
+    driver: bridge
 
 secrets:
   mariadb_database:
