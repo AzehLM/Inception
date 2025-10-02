@@ -6,9 +6,9 @@ WORKDIR /var/www
 
 COPY website/ .
 
-EXPOSE 8080
+EXPOSE 8079
 
-CMD ["httpd", "-f", "-v", "-p", "8080"]
+CMD ["httpd", "-f", "-v", "-p", "8079"]
 
 # https://wiki.alpinelinux.org/wiki/BusyBox
 # https://hub.docker.com/_/busybox

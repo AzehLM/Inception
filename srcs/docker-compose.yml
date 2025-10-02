@@ -84,11 +84,13 @@ services:
     networks:
       - wordpress
     restart: always
+    depends_on:
+      wordpress:
+        condition: service_started
 
   vsftpd:
     container_name: vsftpd
     build: requirements/bonus/vsftpd
-    # new network probably ? will see
     networks:
       - wordpress
     restart: always
@@ -102,6 +104,18 @@ services:
     depends_on:
       wordpress:
         condition: service_started
+
+  adminer:
+    container_name: adminer
+    build: requirements/bonus/adminer
+    networks:
+      - database
+    restart: always
+    ports:
+      - 8080:8080
+    depends_on:
+      mariadb:
+        condition: service_healthy
 
 volumes:
   mariadb_data:
@@ -123,6 +137,7 @@ volumes:
 networks:
   database:
     driver: bridge
+    # internal: true
   wordpress:
     driver: bridge
 

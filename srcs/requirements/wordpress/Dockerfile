@@ -1,5 +1,12 @@
 # syntax=docker/dockerfile:1
 
+FROM alpine:3.21 AS builder
+
+RUN apk add --no-cache wget
+
+RUN wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \
+    && chmod +x wp-cli.phar
+
 FROM alpine:3.21
 
 RUN apk add --no-cache \
@@ -18,10 +25,7 @@ RUN apk add --no-cache \
 # necessary to avoid wp core download fail
 RUN echo "memory_limit = 256M" >> /etc/php83/php.ini
 
-RUN wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \
-	&& chmod +x wp-cli.phar \
-	&& mv wp-cli.phar /usr/local/bin/wp
-
+COPY --from=builder /wp-cli.phar /usr/local/bin/wp
 COPY conf/www.conf /etc/php83/php-fpm.d/www.conf
 COPY tools/entrypoint.sh entrypoint.sh
 
