@@ -7,4 +7,4 @@ RUN apk add --no-cache \
 
 EXPOSE 9090
 
-CMD ["--config.file=/etc/prometheus/prometheus.yml"]
+CMD ["prometheus", "--config.file=/etc/prometheus/prometheus.yml"]

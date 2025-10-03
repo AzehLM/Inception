@@ -8,15 +8,20 @@ DOMAIN_NAME		:= gueberso.42.fr
 DATA_DIR		:= $(HOME)/data/
 MARIADB_DIR		:= $(DATA_DIR)mariadb
 WORDPRESS_DIR	:= $(DATA_DIR)wordpress
+GRAFANA_DIR		:= $(DATA_DIR)grafana
 
 VOLUMES 		:= \
 	mariadb \
 	wordpress \
+	grafana
 
 $(MARIADB_DIR):
 	mkdir -p $@
 
 $(WORDPRESS_DIR):
+	mkdir -p $@
+
+$(GRAFANA_DIR):
 	mkdir -p $@
 
 SECRETS_PATH	:= secrets/ssl/
@@ -34,7 +39,7 @@ $(CERT_PATH) $(KEY_PATH): | $(SECRETS_PATH)
 .DEFAULT_GOAL	:= up
 
 .PHONY: dirs
-dirs: $(MARIADB_DIR) $(WORDPRESS_DIR)
+dirs: $(MARIADB_DIR) $(WORDPRESS_DIR) $(GRAFANA_DIR)
 
 .PHONY: up
 up: $(CERT_PATH) $(KEY_PATH) dirs
