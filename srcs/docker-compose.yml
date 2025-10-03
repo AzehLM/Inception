@@ -153,8 +153,9 @@ services:
     ports:
       - 3000:3000
     volumes:
-      - ./requirements/bonus/grafana/conf/datasources:/etc/grafana/provisioning/datasources:ro
-      - ./requirements/bonus/grafana/conf/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./requirements/bonus/grafana/conf/datasources:/usr/share/grafana/conf/provisioning/datasources:ro
+      - ./requirements/bonus/grafana/conf/dashboards/dashboard.yml:/usr/share/grafana/conf/provisioning/dashboards/dashboard.yml:ro
+      - ./requirements/bonus/grafana/conf/dashboards/json:/usr/share/grafana/conf/provisioning/dashboards/json:ro
       - grafana_data:/var/lib/grafana
     depends_on:
       prometheus:

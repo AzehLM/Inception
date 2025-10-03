@@ -116,3 +116,11 @@ Prometheus/Grafana/cAdvisor:
 https://mobisoftinfotech.com/resources/blog/docker-container-monitoring-prometheus-grafana
 https://www.virtana.com/glossary/what-is-a-tar-cadvisor-container-advisor/#:~:text=cAdvisor%20(Container%20Advisor)%20is%20an,performance%20metrics%20from%20running%20containers.
 https://signoz.io/guides/how-to-install-prometheus-and-grafana-on-docker/ -> looks fucking amazing for the whole
+
+
+https://hub.docker.com/r/google/cadvisor
+https://github.com/google/cadvisor
+https://ipv6.rs/tutorial/Alpine_Linux_Latest/cadvisor/ -> good
+https://github.com/google/cadvisor/blob/master/docs/storage/prometheus.md -> check other readme aswell
+
+
