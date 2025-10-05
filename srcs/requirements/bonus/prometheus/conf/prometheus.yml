@@ -1,10 +1,12 @@
 global:
   scrape_interval: 15s
   evaluation_interval: 15s
+  external_labels:
+    monitor: 'grafana-monitor'
 
 scrape_configs:
   - job_name: 'cadvisor'
-    scrape_interval: 3s # to override the global scraping interval
+    scrape_interval: 5s
     static_configs:
       - targets: ['cadvisor:8080']
   - job_name: 'prometheus'
