@@ -124,7 +124,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "count(container_last_seen{name!=\"\"})",
+          "expr": "count(count by (name) (rate(container_cpu_usage_seconds_total{name=~\".+\"}[1m])))",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -865,109 +865,16 @@
       ],
       "title": "Sent Network Traffic",
       "type": "timeseries"
-    },
-    {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 40
-      },
-      "id": 11,
-      "panels": [],
-      "title": "Details",
-      "type": "row"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "scaleDistribution": {
-              "type": "linear"
-            }
-          },
-          "fieldMinMax": true
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 13,
-        "w": 24,
-        "x": 0,
-        "y": 41
-      },
-      "id": 10,
-      "options": {
-        "calculate": false,
-        "cellGap": 1,
-        "color": {
-          "exponent": 0.5,
-          "fill": "dark-red",
-          "mode": "opacity",
-          "reverse": false,
-          "scale": "exponential",
-          "scheme": "PuRd",
-          "steps": 30
-        },
-        "exemplars": {
-          "color": "rgba(255,0,255,0.7)"
-        },
-        "filterValues": {
-          "le": 1e-9
-        },
-        "legend": {
-          "show": true
-        },
-        "rowsFrame": {
-          "layout": "auto",
-          "value": "Restarts"
-        },
-        "tooltip": {
-          "show": true,
-          "yHistogram": true
-        },
-        "yAxis": {
-          "axisPlacement": "left",
-          "reverse": false
-        }
-      },
-      "pluginVersion": "10.2.0",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Prometheus"
-          },
-          "editorMode": "code",
-          "expr": "changes(container_start_time_seconds{name!=\"\"}[1h])",
-          "instant": false,
-          "legendFormat": "__auto",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Container Restarts",
-      "type": "heatmap"
     }
   ],
-  "refresh": "5s",
+  "refresh": "2s",
   "schemaVersion": 38,
   "tags": [],
   "templating": {
     "list": []
   },
   "time": {
-    "from": "now-3h",
+    "from": "now-2m",
     "to": "now"
   },
   "timepicker": {},
