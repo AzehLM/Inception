@@ -11,7 +11,7 @@ RUN wget -O /usr/local/bin/cadvisor https://github.com/google/cadvisor/releases/
 
 EXPOSE 8080
 
-CMD ["cadvisor", "--url_base_prefix=/cadvisor"]
+CMD ["cadvisor"]
 
 # https://github.com/google/cadvisor/releases/download/v0.39.3/cadvisor
 # https://github.com/google/cadvisor/releases/download/v0.53.0/cadvisor
