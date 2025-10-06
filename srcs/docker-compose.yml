@@ -11,7 +11,7 @@ services:
         condition: service_started
       website:
         condition: service_started
-    restart: always
+    restart: unless-stopped
     init: true
     ports:
       - "443:443"
@@ -32,7 +32,7 @@ services:
     build: requirements/mariadb
     networks:
       - database
-    restart: always
+    restart: unless-stopped
     volumes:
       - mariadb_data:/var/lib/mysql
       - ./requirements/mariadb/conf:/docker-entrypoint-initdb.d/
@@ -59,7 +59,7 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-    restart: always
+    restart: unless-stopped
     secrets:
       - mariadb_database
       - mariadb_user
@@ -76,7 +76,7 @@ services:
     build: requirements/bonus/static-website
     networks:
       - wordpress
-    restart: always
+    restart: unless-stopped
     init: true
 
   redis:
@@ -85,7 +85,7 @@ services:
     networks:
       - wordpress
       - database
-    restart: always
+    restart: unless-stopped
     init: true
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
@@ -102,7 +102,7 @@ services:
     depends_on:
       wordpress:
         condition: service_started
-    restart: always
+    restart: unless-stopped
     ports:
       - "21:21"
       - "21000-21010:21000-21010"
@@ -121,14 +121,14 @@ services:
     depends_on:
       mariadb:
         condition: service_healthy
-    restart: always
+    restart: unless-stopped
 
   cadvisor:
     container_name: cadvisor
     build: requirements/bonus/cadvisor
     networks:
       - monitoring
-    restart: always
+    restart: unless-stopped
     init: true
     volumes:
       - /:/rootfs:ro
@@ -145,7 +145,7 @@ services:
     depends_on:
       cadvisor:
         condition: service_started
-    restart: always
+    restart: unless-stopped
     volumes:
       - ./requirements/bonus/prometheus/conf/prometheus.yml:/etc/prometheus/prometheus.yml:ro
 
@@ -157,7 +157,7 @@ services:
         condition: service_started
     networks:
       - monitoring
-    restart: always
+    restart: unless-stopped
     init: true
     secrets:
       - grafana_admin_user
