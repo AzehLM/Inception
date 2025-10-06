@@ -2,9 +2,8 @@ services:
   nginx:
     container_name: nginx
     build: requirements/nginx
-    # Removed 127.0.0.1 port until im done testing things
     ports:
-      - "443:443"
+      - "127.0.0.1:443:443"
     volumes:
       - wordpress_data:/var/www/html:ro
     networks:
@@ -76,7 +75,7 @@ services:
     init: true
     networks:
       - wordpress
-    restart: unless-stopped
+    restart: always
 
   redis:
     container_name: redis
@@ -124,6 +123,7 @@ services:
     networks:
       - monitoring
     restart: always
+    init: true
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:ro
@@ -196,6 +196,7 @@ networks:
     driver: bridge
   adminer:
     driver: bridge
+    internal: true
   monitoring:
     driver: bridge
     internal: true
