@@ -867,14 +867,14 @@
       "type": "timeseries"
     }
   ],
-  "refresh": "2s",
+  "refresh": "5s",
   "schemaVersion": 38,
   "tags": [],
   "templating": {
     "list": []
   },
   "time": {
-    "from": "now-2m",
+    "from": "now-5m",
     "to": "now"
   },
   "timepicker": {},
