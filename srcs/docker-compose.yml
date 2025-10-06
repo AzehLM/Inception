@@ -147,7 +147,7 @@ services:
         condition: service_started
     restart: always
     volumes:
-    - ./requirements/bonus/prometheus/conf/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./requirements/bonus/prometheus/conf/prometheus.yml:/etc/prometheus/prometheus.yml:ro
 
   grafana:
     container_name: grafana
