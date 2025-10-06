@@ -98,9 +98,9 @@ services:
     restart: always
     ports:
       - "21:21"
-    environment:
-      - FTP_USER=${FTP_USER}
-      - FTP_PASS=${FTP_PASS}
+    secrets:
+      - ftp_user
+      - ftp_password
     volumes:
       - wordpress_data:/var/www/html
     depends_on:
@@ -221,3 +221,7 @@ secrets:
     file: ../secrets/grafana/grafana_admin_user.txt
   grafana_admin_password:
     file: ../secrets/grafana/grafana_admin_password.txt
+  ftp_user:
+    file: ../secrets/vsftpd/ftp_user.txt
+  ftp_password:
+    file: ../secrets/vsftpd/ftp_password.txt
