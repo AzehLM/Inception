@@ -57,6 +57,8 @@ services:
     depends_on:
       mariadb:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     restart: always
     secrets:
       - mariadb_database
@@ -83,11 +85,14 @@ services:
     networks:
       - wordpress
       - database
-    depends_on:
-      wordpress:
-        condition: service_started
     restart: always
     init: true
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
 
   vsftpd:
     container_name: vsftpd
