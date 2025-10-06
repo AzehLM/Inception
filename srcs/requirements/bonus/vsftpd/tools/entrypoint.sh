@@ -1,8 +1,8 @@
 #!/bin/sh
 set -e
 
-FTP_USER=${FTP_USER:-ftpuser}
-FTP_PASS=${FTP_PASS:-changeme}
+FTP_USER=$(cat /run/secrets/ftp_user)
+FTP_PASS=$(cat /run/secrets/ftp_password)
 
 echo "==> Setting up FTP user: $FTP_USER"
 

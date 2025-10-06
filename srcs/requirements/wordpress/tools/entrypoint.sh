@@ -43,6 +43,11 @@ if [ ! -f wp-config.php ]; then
         echo "WordPress already installed."
     fi
 
+    wp theme install generatepress \
+        --activate \
+        --path=/var/www/html \
+        --allow-root
+
     wp config set WP_REDIS_HOST 'redis' --allow-root
     wp config set WP_REDIS_PORT 6379 --raw --allow-root
     wp plugin install redis-cache --activate --allow-root
