@@ -12,6 +12,7 @@ RUN mkdir -p /var/lib/grafana \
     /usr/share/grafana/conf/provisioning/dashboards/json \
     /usr/share/grafana/data
 
+COPY conf/grafana.ini /etc/grafana.ini
 COPY tools/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
