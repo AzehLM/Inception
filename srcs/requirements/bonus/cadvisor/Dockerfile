@@ -6,8 +6,8 @@ RUN apk add --no-cache \
 	libc6-compat \
 	wget
 
-RUN wget -O /usr/local/bin/cadvisor https://github.com/google/cadvisor/releases/download/v0.53.0/cadvisor-v0.53.0-linux-amd64 && \
-    chmod +x /usr/local/bin/cadvisor
+RUN wget -O /usr/local/bin/cadvisor https://github.com/google/cadvisor/releases/download/v0.53.0/cadvisor-v0.53.0-linux-amd64 \
+    && chmod +x /usr/local/bin/cadvisor
 
 EXPOSE 8080
 
