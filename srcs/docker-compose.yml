@@ -2,34 +2,37 @@ services:
   nginx:
     container_name: nginx
     build: requirements/nginx
-    ports:
-      - "443:443"
-    volumes:
-      - wordpress_data:/var/www/html:ro
     networks:
       - wordpress
       - adminer
       - monitoring
-    init: true
+    depends_on:
+      wordpress:
+        condition: service_started
+      website:
+        condition: service_started
     restart: always
+    init: true
+    ports:
+      - "443:443"
+    volumes:
+      - wordpress_data:/var/www/html:ro
+    secrets:
+      - ssl_certificate
+      - ssl_key
     healthcheck:
       test: ["CMD", "curl", "-k", "-f", "https://localhost:443/"]
       interval: 30s
       timeout: 3s
       retries: 3
       start_period: 15s
-    depends_on:
-      wordpress:
-        condition: service_started
-      website:
-        condition: service_started
-    secrets:
-      - ssl_certificate
-      - ssl_key
 
   mariadb:
     container_name: mariadb
     build: requirements/mariadb
+    networks:
+      - database
+    restart: always
     volumes:
       - mariadb_data:/var/lib/mysql
       - ./requirements/mariadb/conf:/docker-entrypoint-initdb.d/
@@ -38,9 +41,6 @@ services:
       - mariadb_database
       - mariadb_user
       - mariadb_password
-    networks:
-      - database
-    restart: always
     healthcheck:
       test: ["CMD", "mariadb-admin", "ping", "-h", "localhost"]
       interval: 30s
@@ -54,12 +54,10 @@ services:
     networks:
       - wordpress
       - database
-    restart: always
-    volumes:
-      - wordpress_data:/var/www/html
     depends_on:
       mariadb:
         condition: service_healthy
+    restart: always
     secrets:
       - mariadb_database
       - mariadb_user
@@ -68,32 +66,37 @@ services:
       - wp_public_user_password
     environment:
       - DOMAIN=${DOMAIN}
+    volumes:
+      - wordpress_data:/var/www/html
 
   website:
     container_name: website
     build: requirements/bonus/static-website
-    init: true
     networks:
       - wordpress
     restart: always
+    init: true
 
   redis:
     container_name: redis
     build: requirements/bonus/redis
-    init: true
     networks:
       - wordpress
       - database
-    restart: always
     depends_on:
       wordpress:
         condition: service_started
+    restart: always
+    init: true
 
   vsftpd:
     container_name: vsftpd
     build: requirements/bonus/vsftpd
     networks:
       - wordpress
+    depends_on:
+      wordpress:
+        condition: service_started
     restart: always
     ports:
       - "21:21"
@@ -102,9 +105,6 @@ services:
       - ftp_password
     volumes:
       - wordpress_data:/var/www/html
-    depends_on:
-      wordpress:
-        condition: service_started
 
   adminer:
     container_name: adminer
@@ -112,10 +112,10 @@ services:
     networks:
       - database
       - adminer
-    restart: always
     depends_on:
       mariadb:
         condition: service_healthy
+    restart: always
 
   cadvisor:
     container_name: cadvisor
@@ -134,29 +134,18 @@ services:
   prometheus:
     container_name: prometheus
     build: requirements/bonus/prometheus
-    volumes:
-    - ./requirements/bonus/prometheus/conf/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    networks:
+      - monitoring
     depends_on:
       cadvisor:
         condition: service_started
-    networks:
-      - monitoring
+    restart: always
+    volumes:
+    - ./requirements/bonus/prometheus/conf/prometheus.yml:/etc/prometheus/prometheus.yml:ro
 
   grafana:
     container_name: grafana
     build: requirements/bonus/grafana
-    secrets:
-      - grafana_admin_user
-      - grafana_admin_password
-    environment:
-      - GF_SERVER_DOMAIN=gueberso.42.fr
-      - GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s:%(http_port)s/grafana/
-      - GF_SERVER_SERVE_FROM_SUB_PATH=true
-    volumes:
-      - ./requirements/bonus/grafana/conf/datasources:/usr/share/grafana/conf/provisioning/datasources:ro
-      - ./requirements/bonus/grafana/conf/dashboards/dashboard.yml:/usr/share/grafana/conf/provisioning/dashboards/dashboard.yml:ro
-      - ./requirements/bonus/grafana/conf/dashboards/json:/usr/share/grafana/conf/provisioning/dashboards/json:ro
-      - grafana_data:/var/lib/grafana
     depends_on:
       prometheus:
         condition: service_started
@@ -164,6 +153,14 @@ services:
       - monitoring
     restart: always
     init: true
+    secrets:
+      - grafana_admin_user
+      - grafana_admin_password
+    volumes:
+      - ./requirements/bonus/grafana/conf/datasources:/usr/share/grafana/conf/provisioning/datasources:ro
+      - ./requirements/bonus/grafana/conf/dashboards/dashboard.yml:/usr/share/grafana/conf/provisioning/dashboards/dashboard.yml:ro
+      - ./requirements/bonus/grafana/conf/dashboards/json:/usr/share/grafana/conf/provisioning/dashboards/json:ro
+      - grafana_data:/var/lib/grafana
 
 volumes:
   mariadb_data:
@@ -199,7 +196,7 @@ networks:
     internal: true
   monitoring:
     driver: bridge
-    # internal: true
+    internal: true
 
 secrets:
   mariadb_database:
