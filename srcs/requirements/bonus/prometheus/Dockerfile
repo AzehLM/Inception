@@ -2,8 +2,7 @@
 
 FROM alpine:3.21
 
-RUN apk add --no-cache \
-	prometheus
+RUN apk add --no-cache prometheus
 
 EXPOSE 9090
 
