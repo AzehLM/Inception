@@ -123,5 +123,4 @@ https://github.com/google/cadvisor
 https://ipv6.rs/tutorial/Alpine_Linux_Latest/cadvisor/ -> good
 https://github.com/google/cadvisor/blob/master/docs/storage/prometheus.md -> check other readme aswell
 
-![test](https://github.com/AzehLM/Inception/blob/main/diagram.png)
-
+![test](https://github.com/AzehLM/Inception/blob/main/assets/diagram.png)
