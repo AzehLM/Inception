@@ -1,16 +1,49 @@
-# Docker Notes
+# Ressources
 
-## Bind/mount volumes
-```bash
-docker run -v "$(pwd)/output.log:/usr/projet/PmergeMe.log" container_qui_exec_PmergeMe
-```
+### Learn docker
 
-Here we started a container executing a PmergeMe program that sends its output to a file `PmergeMe.log`. We've mounted a local file `$(pwd)/output.log` on the container program output file.
-Any changes on one of those two files will affect the other one. They are technically the same.
+- [Full course #1](https://courses.mooc.fi/org/uh-cs/courses/devops-with-docker)
+- [Full course #2](https://github.com/sidpalas/devops-directive-docker-course)
+- [dockerdocs (everything you need is here)](https://docs.docker.com/)
+
+### Specific documentation
+
+- [WP-CLI Commands](https://developer.wordpress.org/cli/commands/)
+- [Mariadb](https://mariadb.com/docs/server/mariadb-quickstart-guides/installing-mariadb-server-guide)
+- [nginx](https://nginx.org/en/docs/)
+
+#### Bonuses
+
+- [Redis](https://redis.io/docs/latest/operate/oss_and_stack/install/install-stack/docker/)
+- [Redis config](https://github.com/rhubarbgroup/redis-cache?tab=readme-ov-file#redis-object-cache-for-wordpress)
+- [Adminer](https://hub.docker.com/_/adminer/)
+- [vsftpd (french documentation)](https://doc.ubuntu-fr.org/vsftpd)
+
+#### cAdvisor/Prometheus/Grafana
+
+- [cAdvisor](https://www.virtana.com/glossary/what-is-a-tar-cadvisor-container-advisor/#:~:text=cAdvisor%20(Container%20Advisor)%20is%20an,performance%20metrics%20from%20running%20containers)
+- [cAdvisor dockerhub](https://hub.docker.com/r/google/cadvisor)
+- [How to set up Prometheus and Grafana](https://signoz.io/guides/how-to-install-prometheus-and-grafana-on-docker/)
+- [Practical Example](https://mobisoftinfotech.com/resources/blog/docker-container-monitoring-prometheus-grafana)
+- [cAdvisor/Prometheus metrics](https://github.com/google/cadvisor/blob/master/docs/storage/prometheus.md)
+
+> Most of those links have redirection to configurations instructions
+
+
+# Diagram of the final project with personal bonuses
+
+![diagram](https://github.com/AzehLM/Inception/blob/main/assets/diagram.png)
+
+
+---
+
+# Notes
+
+Those notes have been made during my learning process, most of those informations might be very specific to question I asked myself at some point while reading documentation or **were** my understanding of what I just read.
 
 ## Port Management
 
-Opening port this way: `<host_port>:<container_port>` → 8080:80 for example will in reality open 0.0.0.0:8080:80.
+Opening port this way: `<host_port>:<container_port>` → 8080:80 will in reality open 0.0.0.0:8080:80.
 This could result in a security breach.
 
 ## PID 1
@@ -56,77 +89,29 @@ Different types of processes:
 It is a intermediary between clients (web browsers) and servers. For Inception, nginx is acting as **reverse proxy**, it receives requests and forwards them to our services.
 Why do we need that here ? nginx handles SSL/TLS encryption by listening
 
-TO DO
 
-## docker-compose file potential modifications
-
-
-
-
-- rename wp-superadmin-user.txt file + change credentials
-- nginx default.conf file -> maybe delete some, everything is not interesting and/or useful
-
-
-### Implementation choices
 
 
 [Funny documentation about HTML/TLS](https://howhttps.works/https-ssl-tls-differences/)
 
 
-REDIS CACHE:
 
-https://hub.docker.com/_/redis
-https://redis.io/docs/latest/operate/oss_and_stack/management/security/
-https://redis.io/docs/latest/operate/oss_and_stack/install/install-stack/docker/
-https://medium.com/@praveenr801/introduction-to-redis-cache-using-docker-container-2e4e2969ed3f
-https://github.com/rhubarbgroup/redis-cache/#configuration
-https://wordpress.org/plugins/redis-cache/#description and underlyings
-
-
-
-cAdvisor: port 4194
-
-top choice
-https://mobisoftinfotech.com/resources/blog/docker-container-monitoring-prometheus-grafana
-
-second choice
-https://belginux.com/monitoring-docker-grafana-prometheus-cadvisor/
-
-
-
-NOTE: need to check more about that
-
+```bash
 echo "vm.overcommit_memory=1" | sudo tee -a /etc/sysctl.conf
 sudo sysctl -p
+```
 
-> Redis needs this setting to allow the kernel to allocate more memory than physically available to ensure background saving (RDB snapshots) or replication can work reliably even under memory pressure.
+Redis needs this setting to allow the kernel to allocate more memory than physically available to ensure background saving (RDB snapshots) or replication can work reliably even under memory pressure.
 
-> Explanation of Memory Overcommit
-
-> Memory Overcommit determines how the Linux kernel handles memory allocation requests that exceed total available RAM.
-
-> When set to 0 (default), the kernel is conservative and may deny allocations that exceed physical RAM, which can cause Redis background processes to fail.
-
-> When set to 1, the kernel allows allocating more memory than physically available, improving Redis reliability during operations needing extra memory temporarily.
+**Explanation of Memory Overcommit:**
+- Memory Overcommit determines how the Linux kernel handles memory allocation requests that exceed total available RAM.
+- When set to 0 (default), the kernel is conservative and may deny allocations that exceed physical RAM, which can cause Redis background processes to fail.
+- When set to 1, the kernel allows allocating more memory than physically available, improving Redis reliability during operations needing extra memory temporarily.
 
 
 
-Prometheus/Grafana/cAdvisor:
 
-https://mobisoftinfotech.com/resources/blog/docker-container-monitoring-prometheus-grafana
-https://www.virtana.com/glossary/what-is-a-tar-cadvisor-container-advisor/#:~:text=cAdvisor%20(Container%20Advisor)%20is%20an,performance%20metrics%20from%20running%20containers.
-https://signoz.io/guides/how-to-install-prometheus-and-grafana-on-docker/ -> looks fucking amazing for the whole
-
-
-https://hub.docker.com/r/google/cadvisor
-https://github.com/google/cadvisor
-https://ipv6.rs/tutorial/Alpine_Linux_Latest/cadvisor/ -> good
-https://github.com/google/cadvisor/blob/master/docs/storage/prometheus.md -> check other readme aswell
-
-![test](https://github.com/AzehLM/Inception/blob/main/assets/diagram.png)
-
-
-# Dump notions (not detailed)
+# Dump notions and usage (not detailed)
 
 ## Health Checks
 **What it is**: Built-in monitoring to ensure containers are actually working, not just running.
