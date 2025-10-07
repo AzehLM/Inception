@@ -1,47 +1,147 @@
-# Dump notions (not detailed)
+# Docker Notes
 
-## Docker Compose Watch Mode
-**What it is**: Automatically rebuilds and restarts services when code changes are detected.
-
-```yaml
-# docker-compose.yml
-services:
-  web:
-    build: .
-    develop:
-      watch:
-        - action: rebuild
-          path: ./src
-        - action: sync
-          path: ./static
-          target: /app/static
+## Bind/mount volumes
+```bash
+docker run -v "$(pwd)/output.log:/usr/projet/PmergeMe.log" container_qui_exec_PmergeMe
 ```
 
-**Usage**: `docker compose watch`
-**Benefits**: Instant development feedback, no manual rebuilds needed.
+Here we started a container executing a PmergeMe program that sends its output to a file `PmergeMe.log`. We've mounted a local file `$(pwd)/output.log` on the container program output file.
+Any changes on one of those two files will affect the other one. They are technically the same.
+
+## Port Management
+
+Opening port this way: `<host_port>:<container_port>` → 8080:80 for example will in reality open 0.0.0.0:8080:80.
+This could result in a security breach.
+
+## PID 1
+
+There are fundamental differences between a Linux system and a container.
+
+In a Linux system, the PID 1 is the one booting the system (`systemd`, `SysV init`, ...) and it has two responsibilities:
+- Parent process of any orphan process
+- Act as a reaping process: it reaps any zombie processes.
+
+In a container, either the `CMD` or the `ENTRYPOINT` becomes the PID 1 of its container.
+The command executed as PID 1 has to be designed to handle the responsibilities of a PID1 process.
+
+The subject forbids `tail -f /dev/null` and so on is here to prevent us having commands not designed as PID 1 processes. By definition, containers are not VMs, these are process isolating environments.
+
+## Difference of execution between JSON/shell format
+- Exec(JSON) format: `CMD ["cmd", "json", "format"]` → Docker uses `execve()` with the args: CMD ["command"] → **(PID 1 = command)**
+- Shell format: `CMD "cmd"` → Docker does `/bin/sh -c` then gives it the command as arg: CMD "cmd" → `/bin/sh -c cmd` **(PID 1 = sh)**
+
+## Reasons behind the choice of design of Docker
+- Inheritance and compatibility → principle of `least surprise`: by convention, we give a string to an executing process, traditionally interpreted by a shell.
+
+- Two distinct usages:
+	- Shell format: simplicity, use of native functionalities of a shell (piping, variables, env, ...), compatibility with existing scripts. Few or no management by the dev.
+	- Exec format: Total control over signals, performances, predictability...
+
+## CGI (Common Gateway Interface)
+
+A standard allowing the communication between an HTTP server and external processes. Allows the web server to interact with different programming languages. It is an interface standardizing the transmission of requests between a web server and dynamic applications.
+
+## PHP-FPM
+
+Alternative to FastCGI.
+It creates a pool of PHP processes. When it gets a request, PHP-FPM chooses the available processes from the pool to handle the request.
+Different types of processes:
+- Master process: responsible for the management of the pool processes. It listens to the incoming requests and distributes them.
+- Worker processes: responsible for the execution of PHP scripts. Can run dynamically, statically or on demand. When a worker receives a request, it executes the PHP scripts and returns the output to the web server.
+
+## Proxy / Reverse Proxy
+
+- What is a proxy ?
+
+It is a intermediary between clients (web browsers) and servers. For Inception, nginx is acting as **reverse proxy**, it receives requests and forwards them to our services.
+Why do we need that here ? nginx handles SSL/TLS encryption by listening
+
+TO DO
+
+## docker-compose file potential modifications
+
+
+
+
+- rename wp-superadmin-user.txt file + change credentials
+- nginx default.conf file -> maybe delete some, everything is not interesting and/or useful
+
+
+### Implementation choices
+
+
+[Funny documentation about HTML/TLS](https://howhttps.works/https-ssl-tls-differences/)
+
+
+REDIS CACHE:
+
+https://hub.docker.com/_/redis
+https://redis.io/docs/latest/operate/oss_and_stack/management/security/
+https://redis.io/docs/latest/operate/oss_and_stack/install/install-stack/docker/
+https://medium.com/@praveenr801/introduction-to-redis-cache-using-docker-container-2e4e2969ed3f
+https://github.com/rhubarbgroup/redis-cache/#configuration
+https://wordpress.org/plugins/redis-cache/#description and underlyings
+
+
+
+cAdvisor: port 4194
+
+top choice
+https://mobisoftinfotech.com/resources/blog/docker-container-monitoring-prometheus-grafana
+
+second choice
+https://belginux.com/monitoring-docker-grafana-prometheus-cadvisor/
+
+
+
+NOTE: need to check more about that
+
+echo "vm.overcommit_memory=1" | sudo tee -a /etc/sysctl.conf
+sudo sysctl -p
+
+> Redis needs this setting to allow the kernel to allocate more memory than physically available to ensure background saving (RDB snapshots) or replication can work reliably even under memory pressure.
+
+> Explanation of Memory Overcommit
+
+> Memory Overcommit determines how the Linux kernel handles memory allocation requests that exceed total available RAM.
+
+> When set to 0 (default), the kernel is conservative and may deny allocations that exceed physical RAM, which can cause Redis background processes to fail.
+
+> When set to 1, the kernel allows allocating more memory than physically available, improving Redis reliability during operations needing extra memory temporarily.
+
+
+
+Prometheus/Grafana/cAdvisor:
+
+https://mobisoftinfotech.com/resources/blog/docker-container-monitoring-prometheus-grafana
+https://www.virtana.com/glossary/what-is-a-tar-cadvisor-container-advisor/#:~:text=cAdvisor%20(Container%20Advisor)%20is%20an,performance%20metrics%20from%20running%20containers.
+https://signoz.io/guides/how-to-install-prometheus-and-grafana-on-docker/ -> looks fucking amazing for the whole
+
+
+https://hub.docker.com/r/google/cadvisor
+https://github.com/google/cadvisor
+https://ipv6.rs/tutorial/Alpine_Linux_Latest/cadvisor/ -> good
+https://github.com/google/cadvisor/blob/master/docs/storage/prometheus.md -> check other readme aswell
+
+![test](https://github.com/AzehLM/Inception/blob/main/assets/diagram.png)
+
+
+# Dump notions (not detailed)
 
 ## Health Checks
 **What it is**: Built-in monitoring to ensure containers are actually working, not just running.
-
-```dockerfile
-# In Dockerfile
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:8080/health || exit 1
-```
 
 ```yaml
 # In docker-compose.yml
 services:
   nginx:
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80/"]
+      test: ["CMD", "curl", "-f", "http://localhost:x/"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
 ```
-
-**Benefits**: Automatic container restart on failure, better orchestration decisions.
 
 ## Multi-Stage Builds
 **What it is**: Use multiple FROM statements to create optimized, smaller final images.
@@ -53,7 +153,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci --only=production
 
-# Production stage  
+# Production stage
 FROM node:18-alpine AS production
 WORKDIR /app
 COPY --from=builder /app/node_modules ./node_modules
@@ -63,25 +163,6 @@ CMD ["npm", "start"]
 ```
 
 **Benefits**: Smaller images, better security (no build tools in production), faster deployments.
-
-## BuildKit Advanced Features
-**What it is**: Modern build engine with advanced caching and parallel builds.
-
-```dockerfile
-# syntax=docker/dockerfile:1
-FROM alpine
-
-# Cache mount for package manager
-RUN --mount=type=cache,target=/var/cache/apk \
-    apk add --update git
-
-# Secret mount (never stored in image)
-RUN --mount=type=secret,id=api_key \
-    curl -H "Authorization: $(cat /run/secrets/api_key)" api.example.com
-```
-
-**Enable with**: `DOCKER_BUILDKIT=1` or in daemon.json
-**Benefits**: Faster builds, better caching, secrets handling, parallel execution.
 
 ## Docker Secrets & Security
 **What it is**: Secure way to handle sensitive data without embedding in images.
@@ -101,37 +182,6 @@ secrets:
     file: ./secrets/db_password.txt
 ```
 
-**Security best practices**:
-```dockerfile
-# Run as non-root user
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S nextjs -u 1001
-USER nextjs
-
-# Use distroless images when possible
-FROM gcr.io/distroless/nodejs18-debian11
-```
-
-
-## Init System in Containers
-**What it is**: Proper signal handling and zombie process reaping.
-
-```dockerfile
-# Option 1: Use tini
-RUN apk add --no-cache tini
-ENTRYPOINT ["/sbin/tini", "--"]
-
-# Option 2: Docker's built-in init
-# docker run --init myimage
-```
-
-```yaml
-# In compose
-services:
-  app:
-    init: true
-```
-
 ## Advanced Networking
 **What it is**: Custom networks for service isolation and communication.
 
@@ -140,12 +190,12 @@ services:
   frontend:
     networks:
       - web-tier
-  
+
   backend:
     networks:
       - web-tier
       - database-tier
-  
+
   database:
     networks:
       - database-tier
@@ -155,32 +205,6 @@ networks:
     driver: bridge
   database-tier:
     internal: true  # No external access
-```
-
-## Volume Best Practices
-**What it is**: Efficient data persistence and sharing strategies.
-
-```yaml
-services:
-  app:
-    volumes:
-      # Named volume for data persistence
-      - app_data:/var/lib/app
-      # Bind mount for development (with consistency settings)
-      - ./src:/app/src:cached
-      # tmpfs for temporary files
-      - type: tmpfs
-        target: /tmp
-        tmpfs:
-          size: 100M
-
-volumes:
-  app_data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /host/path/data
 ```
 
 ## Container Communication Patterns
@@ -193,96 +217,8 @@ services:
       db:
         condition: service_healthy
         restart: true
-  
+
   db:
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "postgres"]
 ```
-
-## Monitoring & Debugging
-
-```bash
-# Monitor resource usage
-docker stats
-
-# Stream container events
-docker events --filter container=mycontainer
-
-# Inspect container processes
-docker exec container_name ps aux
-
-# Export container filesystem changes
-docker diff container_name
-```
-
-## Development Workflow Commands
-
-```bash
-# Build with build-time arguments
-docker build --build-arg NODE_ENV=development .
-
-# Override compose file for different environments
-docker compose -f docker-compose.yml -f docker-compose.dev.yml up
-
-# Scale services
-docker compose up --scale web=3
-
-# View service logs with timestamps
-docker compose logs -f --timestamps web
-```
-
-## Tips
-
-1. **Use `.dockerignore`** to exclude unnecessary files from build context
-2. **Implement graceful shutdown** handling in your applications
-3. **Use specific image tags** instead of `latest` for reproducibility
-4. **Enable Docker content trust** for image verification in production
-5. **Implement proper logging** strategies (stdout/stderr, log drivers)
-6. **Use labels** for better container organization and metadata
-
-```dockerfile
-# Example of comprehensive Dockerfile
-# syntax=docker/dockerfile:1
-FROM node:18-alpine AS base
-WORKDIR /app
-
-# Install dependencies
-FROM base AS deps
-COPY package*.json ./
-RUN --mount=type=cache,target=/root/.npm \
-    npm ci --only=production
-
-# Build application
-FROM base AS build
-COPY package*.json ./
-RUN --mount=type=cache,target=/root/.npm \
-    npm ci
-COPY . .
-RUN npm run build
-
-# Production image
-FROM node:18-alpine AS runner
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
-
-WORKDIR /app
-COPY --from=deps --chown=nextjs:nodejs /app/node_modules ./node_modules
-COPY --from=build --chown=nextjs:nodejs /app/dist ./dist
-
-USER nextjs
-EXPOSE 3000
-
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:3000/health || exit 1
-
-CMD ["npm", "start"]
-```
-
-## Getting Started
-
-1. Enable BuildKit: `export DOCKER_BUILDKIT=1`
-2. Start with health checks for all your services
-3. Implement watch mode for development
-4. Use multi-stage builds for optimized images
-5. Add proper resource constraints
-6. Implement security best practices from day one
