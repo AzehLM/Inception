@@ -34,6 +34,37 @@
 
 ![diagram](https://github.com/AzehLM/Inception/blob/main/assets/diagram.png)
 
+# Setup Instructions
+
+## Directory Structure
+
+After cloning the repository, you'll need to create the secrets directory and configuration files. Here's what the final structure should look like:
+
+```
+.
+├── Makefile
+├── README.md
+├── secrets/
+│   ├── grafana/
+│   │   ├── grafana_admin_password.txt
+│   │   └── grafana_admin_user.txt
+│   ├── mariadb/
+│   │   ├── mariadb_database.txt
+│   │   ├── mariadb_password.txt
+│   │   ├── mariadb_root_password.txt
+│   │   └── mariadb_user.txt
+│   ├── vsftpd/
+│   │   ├── ftp_password.txt
+│   │   └── ftp_user.txt
+│   └── wordpress/
+│       ├── wp_admin.txt
+│       └── wp_public_user_password.txt
+└── srcs/
+    ├── .env
+    ├── docker-compose.yml
+    └── requirements/
+```
+> The SSL certificate will be generated at the first build and placed in the secrets directory aswell.
 
 ---
 
