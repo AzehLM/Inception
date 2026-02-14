@@ -1,7 +1,9 @@
 services:
   nginx:
     container_name: nginx
-    build: requirements/nginx
+    build:
+      context: requirements/nginx
+    image: nginx
     networks:
       - wordpress
       - adminer
@@ -29,7 +31,9 @@ services:
 
   mariadb:
     container_name: mariadb
-    build: requirements/mariadb
+    build:
+      context: requirements/mariadb
+    image: mariadb
     networks:
       - database
     restart: unless-stopped
@@ -50,7 +54,9 @@ services:
 
   wordpress:
     container_name: wordpress
-    build: requirements/wordpress
+    build:
+      context: requirements/wordpress
+    image: wordpress
     networks:
       - wordpress
       - database
@@ -73,7 +79,9 @@ services:
 
   website:
     container_name: website
-    build: requirements/bonus/static-website
+    build:
+      context: requirements/bonus/static-website
+    image: website
     networks:
       - wordpress
     restart: unless-stopped
@@ -81,7 +89,9 @@ services:
 
   redis:
     container_name: redis
-    build: requirements/bonus/redis
+    build:
+      context: requirements/bonus/redis
+    image: redis
     networks:
       - wordpress
       - database
@@ -96,7 +106,9 @@ services:
 
   vsftpd:
     container_name: vsftpd
-    build: requirements/bonus/vsftpd
+    build:
+      context: requirements/bonus/vsftpd
+    image: vsftpd
     networks:
       - wordpress
     depends_on:
@@ -114,7 +126,9 @@ services:
 
   adminer:
     container_name: adminer
-    build: requirements/bonus/adminer
+    build:
+      context: requirements/bonus/adminer
+    image: adminer
     networks:
       - database
       - adminer
@@ -125,7 +139,9 @@ services:
 
   cadvisor:
     container_name: cadvisor
-    build: requirements/bonus/cadvisor
+    build:
+      context: requirements/bonus/cadvisor
+    image: cadvisor
     networks:
       - monitoring
     restart: unless-stopped
@@ -139,7 +155,9 @@ services:
 
   prometheus:
     container_name: prometheus
-    build: requirements/bonus/prometheus
+    build:
+      context: requirements/bonus/prometheus
+    image: prometheus
     networks:
       - monitoring
     depends_on:
@@ -151,7 +169,9 @@ services:
 
   grafana:
     container_name: grafana
-    build: requirements/bonus/grafana
+    build:
+      context: requirements/bonus/grafana
+    image: grafana
     depends_on:
       prometheus:
         condition: service_started
@@ -195,14 +215,18 @@ networks:
   database:
     driver: bridge
     internal: true
+    name: database
   wordpress:
     driver: bridge
+    name: wordpress
   adminer:
     driver: bridge
     internal: true
+    name: adminer
   monitoring:
     driver: bridge
     internal: true
+    name: monitoring
 
 secrets:
   mariadb_database:
